@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoWatt – Simulador de Energia Limpa</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ===== CABEÇALHO ===== -->
+  <header class="topo">
+    <div class="container topo-conteudo">
+      <a href="#inicio" class="logo">☀️ EcoWatt</a>
+      <nav class="menu">
+        <a href="#simulador">Simular</a>
+        <a href="#vitrine">Vitrine</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- ===== SEÇÃO 1: INÍCIO ===== -->
+    <section id="inicio" class="hero">
+      <div class="container">
+        <h1>Descubra quanto você economiza com energia solar</h1>
+        <p>Compare em segundos a <strong>assinatura de energia solar</strong> (sem obra) com a
+          <strong>instalação de placas</strong> no seu telhado. Grátis e sem cadastro.</p>
+        <a href="#simulador" class="botao botao-amarelo">⚡ Fazer simulação</a>
+      </div>
+    </section>
+
+    <!-- ===== SEÇÃO 2: FORMULÁRIO ===== -->
+    <section id="simulador" class="secao">
+      <div class="container">
+        <h2>🏠 Seus dados</h2>
+        <form id="formulario" class="card formulario" novalidate>
+
+          <div class="campo">
+            <label for="cep">CEP</label>
+            <input type="text" id="cep" inputmode="numeric" placeholder="30000-000" maxlength="9" autocomplete="postal-code">
+            <small class="erro" id="erro-cep"></small>
+          </div>
+
+          <div class="campo">
+            <label for="valorConta">Valor médio da conta de luz (R$)</label>
+            <input type="number" id="valorConta" min="0" step="0.01" placeholder="Ex.: 300">
+            <small class="erro" id="erro-valorConta"></small>
+          </div>
+
+          <div class="campo">
+            <label for="tipoLigacao">Tipo de ligação</label>
+            <select id="tipoLigacao">
+              <option value="monofasica">Monofásica (até 2 fios)</option>
+              <option value="bifasica" selected>Bifásica (3 fios)</option>
+              <option value="trifasica">Trifásica (4 fios)</option>
+            </select>
+            <small class="dica">Está escrito na sua conta de luz.</small>
+          </div>
+
+          <fieldset class="campo">
+            <legend>O imóvel é</legend>
+            <div class="opcoes-radio">
+              <label><input type="radio" name="imovel" value="proprio" checked> Próprio</label>
+              <label><input type="radio" name="imovel" value="alugado"> Alugado</label>
+            </div>
+          </fieldset>
+
+          <button type="submit" class="botao botao-verde">💰 Calcular economia</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ===== SEÇÃO 3: RESULTADOS (escondida até calcular) ===== -->
+    <section id="resultados" class="secao secao-clara" hidden>
+      <div class="container">
+        <h2>💰 Seu resultado</h2>
+
+        <!-- Destaque principal: a economia em R$ -->
+        <div class="destaque-economia card">
+          <p id="destaque-titulo">Você pode economizar até</p>
+          <p class="valor-economia" id="destaque-valor">R$ 0,00</p>
+          <p id="destaque-sub">por mês</p>
+        </div>
+
+        <p class="aviso" id="aviso-geral" hidden></p>
+
+        <!-- Cards das duas opções -->
+        <div class="grade-opcoes">
+          <article class="card opcao" id="card-a">
+            <span class="selo" hidden>⭐ Recomendado</span>
+            <h3>Opção A – Assinatura solar</h3>
+            <p class="descricao">Você paga uma mensalidade e recebe desconto na conta. Sem obra, serve para imóvel alugado.</p>
+            <div id="conteudo-a"></div>
+          </article>
+
+          <article class="card opcao" id="card-b">
+            <span class="selo" hidden>⭐ Recomendado</span>
+            <h3>Opção B – Placas no telhado</h3>
+            <p class="descricao">Você compra e instala o sistema. Investimento inicial maior, economia maior.</p>
+            <div id="conteudo-b"></div>
+          </article>
+        </div>
+
+        <p class="motivo" id="motivo"></p>
+
+        <!-- Gráfico de comparação -->
+        <div class="card">
+          <h3>📈 Ganho acumulado em 5 anos</h3>
+          <div class="area-grafico">
+            <canvas id="grafico"></canvas>
+          </div>
+          <p class="dica" id="aviso-grafico">Na opção B a linha começa negativa por causa do investimento e sobe com a economia mensal.</p>
+        </div>
+
+        <p class="dica">Consumo estimado: <strong id="consumo">–</strong> por mês.</p>
+      </div>
+    </section>
+
+    <!-- ===== SEÇÃO 4: VITRINE ===== -->
+    <section id="vitrine" class="secao">
+      <div class="container">
+        <h2>🛒 Vitrine de equipamentos</h2>
+        <p class="aviso">Preços ilustrativos para fins acadêmicos.</p>
+        <div class="filtros" id="filtros">
+          <button type="button" class="filtro ativo" data-categoria="todos">Todos</button>
+          <button type="button" class="filtro" data-categoria="novo">Novos</button>
+          <button type="button" class="filtro" data-categoria="usado">Usados</button>
+          <button type="button" class="filtro" data-categoria="recondicionado">Recondicionados</button>
+        </div>
+        <div class="grade-vitrine" id="lista-vitrine"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape">
+    <div class="container">
+      <p>EcoWatt – Projeto acadêmico UPX 3 · Cidades Inteligentes · ODS 7 (Energia limpa e acessível)</p>
+      <p class="dica">Simulação estimada. Os valores reais dependem do seu telhado, da distribuidora e da empresa escolhida.</p>
+    </div>
+  </footer>
+
+  <!-- Chart.js via CDN (única dependência externa) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+  <!-- A ordem importa: primeiro os dados, depois os cálculos, por último a tela -->
+  <script src="js/dados.js"></script>
+  <script src="js/calculo.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
