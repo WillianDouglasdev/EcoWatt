@@ -15,6 +15,12 @@ const secaoResultados = document.getElementById('resultados');
 
 let graficoAtual = null; // guarda o gráfico para poder apagar antes de desenhar outro
 
+// ---------- Ícones ----------
+// "Carimba" um ícone que está guardado no index.html (<symbol id="i-nome">)
+function icone(nome) {
+  return '<svg class="icone" aria-hidden="true"><use href="#i-' + nome + '"/></svg>';
+}
+
 // ---------- Formatação ----------
 // Usa formatarMoeda do calculo.js se existir; senão, formata aqui mesmo.
 function moeda(valor) {
@@ -100,9 +106,9 @@ function montarCardA(opcaoA) {
     const valor = empresa.elegivel
       ? '<strong class="empresa-valor">' + moeda(empresa.economiaMensal) + '<small>/mês</small></strong>'
       : '<strong class="empresa-valor">–</strong>';
-    const link = empresa.site ? '<a href="' + empresa.site + '" target="_blank" rel="noopener">Ver site ↗</a>' : '';
+    const link = empresa.site ? '<a href="' + empresa.site + '" target="_blank" rel="noopener">Ver site ' + icone('externo') + '</a>' : '';
     html += '<div class="' + classe + '">' +
-              '<div><span class="nome">' + empresa.nome + '</span>' + etiqueta +
+              '<div><span class="nome">' + empresa.nome + (ehMelhor ? icone('estrela') : '') + '</span>' + etiqueta +
               '<span class="empresa-link">' + (empresa.elegivel ? link : 'Não disponível para o seu valor de conta') + '</span></div>' +
               valor +
             '</div>';
@@ -250,7 +256,7 @@ formulario.addEventListener('submit', function (evento) {
   // Aviso quando o imóvel é alugado e nenhuma empresa aceita a conta
   const aviso = document.getElementById('aviso-geral');
   if (resultado.recomendacao === null) {
-    aviso.textContent = '⚠️ Nenhuma opção disponível: imóvel alugado não permite instalar placas e sua conta está abaixo da fatura mínima das empresas de assinatura.';
+    aviso.textContent = 'Nenhuma opção disponível: imóvel alugado não permite instalar placas e sua conta está abaixo da fatura mínima das empresas de assinatura.';
     aviso.hidden = false;
   } else {
     aviso.hidden = true;
@@ -265,11 +271,11 @@ formulario.addEventListener('submit', function (evento) {
 });
 
 // ---------- Vitrine ----------
-// Escolhe um emoji para a "foto" do produto pelo nome (só visual)
+// Escolhe o ícone da "foto" do produto pelo nome (só visual)
 function iconeDoItem(nome) {
-  if (/kit/i.test(nome)) return '📦';
-  if (/inversor/i.test(nome)) return '🔌';
-  return '☀️';
+  if (/kit/i.test(nome)) return icone('caixa');
+  if (/inversor/i.test(nome)) return icone('inversor');
+  return icone('painel');
 }
 
 function montarVitrine(categoria) {
@@ -279,7 +285,7 @@ function montarVitrine(categoria) {
   });
 
   lista.innerHTML = itens.map(function (item) {
-    const potencia = item.potencia ? '<span class="dica">⚡ ' + item.potencia + '</span>' : '';
+    const potencia = item.potencia ? '<span class="dica">' + icone('raio') + ' ' + item.potencia + '</span>' : '';
     return '<article class="card item-vitrine">' +
              '<div class="foto">' +
                '<span class="categoria ' + item.categoria + '">' + item.categoria + '</span>' +
@@ -288,7 +294,7 @@ function montarVitrine(categoria) {
              '<div class="info">' +
                '<h3>' + item.nome + '</h3>' + potencia +
                '<span class="preco">' + moeda(item.preco) + '</span>' +
-               '<span class="dica">🏪 ' + item.loja + '</span>' +
+               '<span class="dica loja">' + icone('loja') + ' ' + item.loja + '</span>' +
              '</div>' +
            '</article>';
   }).join('');
