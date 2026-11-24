@@ -20,6 +20,8 @@ Um **motor de regras** recomenda a melhor opção (imóvel alugado, fatura míni
 - **Quanto do consumo o sol cobre** e quanto continua vindo da rede (o mínimo de disponibilidade da Cemig).
 - **Área do telhado (opcional):** confere se as placas cabem e recalcula a economia se não couberem.
 - **Um dia de sol:** geração x consumo hora a hora, com a **sobra de dia**, a **falta à noite** e o tamanho de uma **bateria** para guardar a sobra (estimativa educativa).
+- **Calculadora de tarifa:** escolha a bandeira (verde, amarela, vermelha 1 ou 2, valores da ANEEL) e veja a conta, a economia de cada opção e o retorno mudarem.
+- **Comparar cenários:** guarde duas simulações e veja lado a lado, com o melhor valor de cada linha em destaque e a diferença entre elas.
 - **Energia inteligente:** gerar, acompanhar e guardar, dicas de horário de uso e os ODS 7, 9 e 11.
 - **Vitrine** de equipamentos novos, usados e recondicionados (preços ilustrativos).
 
@@ -35,7 +37,7 @@ Versão publicada (GitHub Pages): https://williandouglasdev.github.io/EcoWatt/
 ```text
 index.html      página única: início, simulador, resultados, energia inteligente e vitrine
 css/style.css   identidade visual e responsividade
-js/dados.js     parâmetros, faixa de CEP, empresas, perfil de consumo por hora e vitrine
+js/dados.js     parâmetros, faixa de CEP, empresas, bandeiras tarifárias, perfil de consumo por hora e vitrine
 js/calculo.js   funções puras de cálculo e motor de regras (não mexe na tela)
 js/app.js       lê o formulário, valida, chama os cálculos e mostra os resultados
 img/            fotos da vitrine (Wikimedia Commons, créditos no site)

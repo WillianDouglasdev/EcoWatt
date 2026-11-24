@@ -41,6 +41,10 @@
     <symbol id="i-cidade" viewBox="0 0 24 24"><path d="M3 21h18M5 21V9l5-3v15M10 21V3h6v18M16 21v-9h4v9M13 7h0M13 11h0M13 15h0"/></symbol>
     <symbol id="i-rede" viewBox="0 0 24 24"><path d="M12 2 7 22M12 2l5 20M8.5 16h7M9.7 11h4.6M5 6h14M12 2v4"/></symbol>
     <symbol id="i-telhado" viewBox="0 0 24 24"><path d="M2 12 12 4l10 8M5 10v10h14V10M9 14h6"/></symbol>
+    <symbol id="i-bandeira" viewBox="0 0 24 24"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></symbol>
+    <symbol id="i-colunas" viewBox="0 0 24 24"><rect x="3" y="4" width="7.5" height="16" rx="1.5"/><rect x="13.5" y="4" width="7.5" height="16" rx="1.5"/><path d="M5.5 9h2.5M16 9h2.5M5.5 13h2.5M16 13h2.5"/></symbol>
+    <symbol id="i-mais" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
     <symbol id="i-loja" viewBox="0 0 24 24"><path d="M3 9l1.5-5h15L21 9M3 9a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0M5 11.5V20h14v-8.5M10 20v-5h4v5"/></symbol>
   </svg>
 
@@ -251,6 +255,57 @@
             <div><span class="numero-icone bateria"><svg class="icone" aria-hidden="true"><use href="#i-bateria"/></svg></span><p>Bateria para guardar a sobra</p><strong id="dia-bateria">–</strong><small>estimativa educativa</small></div>
           </div>
           <p class="dica" id="texto-dia">No Brasil a sobra vai para a rede e vira crédito na conta (Lei 14.300/2022), por isso a bateria é opcional. Ela serve para usar o sol à noite e manter a casa ligada se a energia cair.</p>
+        </div>
+
+        <!-- EXTRA: calculadora de tarifa (bandeiras tarifárias da ANEEL) -->
+        <div class="card card-bandeira" id="card-bandeira">
+          <div class="cabecalho-card">
+            <div>
+              <h3><svg class="icone" aria-hidden="true"><use href="#i-bandeira"/></svg> Calculadora de tarifa</h3>
+              <p class="dica">E se a bandeira mudar? Escolha uma cor e veja sua conta e sua economia.</p>
+            </div>
+          </div>
+          <div class="seletor-bandeira" id="seletor-bandeira" role="radiogroup" aria-label="Bandeira tarifária"></div>
+          <p class="bandeira-quando" id="bandeira-quando"></p>
+
+          <div class="tiles-bandeira">
+            <div class="tile tile-conta">
+              <p>Sua conta</p>
+              <strong id="band-conta">–</strong>
+              <small id="band-acrescimo"></small>
+            </div>
+            <div class="tile">
+              <p>Com assinatura</p>
+              <strong id="band-a">–</strong>
+              <small id="band-a-sub"></small>
+            </div>
+            <div class="tile tile-destaque">
+              <p>Com placas</p>
+              <strong id="band-b">–</strong>
+              <small id="band-b-sub"></small>
+            </div>
+          </div>
+
+          <div class="escada-bandeiras" id="escada-bandeiras" aria-label="Conta em cada bandeira"></div>
+          <div class="legenda-pizza legenda-escada">
+            <span><b class="ponto ponto-pago"></b> Ainda paga com placas</span>
+            <span><b class="ponto ponto-economia"></b> O sol paga</span>
+          </div>
+          <p class="dica fonte">Valores das bandeiras: ANEEL, 2026 (R$ 1,885, R$ 4,463 e R$ 7,877 a cada 100 kWh). O valor digitado é tratado como a conta em bandeira verde. Simplificação: os tributos sobre o adicional não foram recalculados.</p>
+        </div>
+
+        <!-- EXTRA: comparar dois cenários lado a lado -->
+        <div class="card card-cenarios" id="card-cenarios">
+          <div class="cabecalho-card">
+            <div>
+              <h3><svg class="icone" aria-hidden="true"><use href="#i-colunas"/></svg> Comparar cenários</h3>
+              <p class="dica">Guarde esta simulação, mude os dados no formulário e guarde outra. Ex.: conta de hoje x conta com um ar-condicionado novo.</p>
+            </div>
+            <button type="button" class="botao botao-verde botao-guardar" id="btn-guardar"><svg class="icone" aria-hidden="true"><use href="#i-mais"/></svg> Guardar este cenário</button>
+          </div>
+          <p class="dica aviso-guardado" id="aviso-guardado" aria-live="polite"></p>
+          <div class="vagas-cenario" id="vagas-cenario"></div>
+          <div class="tabela-rolagem" id="comparacao" hidden></div>
         </div>
 
         <p class="consumo-chip"><svg class="icone" aria-hidden="true"><use href="#i-raio"/></svg> Consumo estimado: <strong id="consumo">–</strong> por mês</p>

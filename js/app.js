@@ -317,6 +317,205 @@ function montarDiaDeSol(resultado) {
   });
 }
 
+// ---------- EXTRA: calculadora de tarifa (bandeiras) ----------
+// Analogia: o semáforo da conta de luz. Verde = preço normal; amarela e
+// vermelhas = cada kWh fica mais caro. Quem tem placas sente menos, porque
+// a energia que o sol gera não passa pela bandeira.
+let bandeiraAtual = 'verde';
+let resultadoAtual = null;   // última simulação (para a bandeira e os cenários)
+let entradaAtual = null;     // dados digitados na última simulação
+
+function montarSeletorBandeira() {
+  document.getElementById('seletor-bandeira').innerHTML = BANDEIRAS.map(function (b) {
+    return '<button type="button" role="radio" class="chip-bandeira chip-' + b.id + '" data-id="' + b.id + '" aria-checked="' + (b.id === bandeiraAtual) + '">' +
+             '<span class="bolinha"></span>' + b.nome +
+             '<small>' + (b.adicional > 0 ? '+' + moeda(b.adicional * 100) + '/100 kWh' : 'sem acréscimo') + '</small>' +
+           '</button>';
+  }).join('');
+}
+
+function atualizarBandeira() {
+  if (!resultadoAtual) return;
+  const x = simularBandeira(resultadoAtual, bandeiraAtual);
+  const card = document.getElementById('card-bandeira');
+  card.dataset.bandeira = bandeiraAtual; // o CSS usa isso para mudar a cor de destaque
+
+  document.querySelectorAll('.chip-bandeira').forEach(function (botao) {
+    botao.setAttribute('aria-checked', botao.dataset.id === bandeiraAtual);
+  });
+  document.getElementById('bandeira-quando').textContent = 'Bandeira ' + x.bandeira.nome.toLowerCase() + ': ' + x.bandeira.quando + '.';
+
+  document.getElementById('band-conta').textContent = moeda(x.conta);
+  document.getElementById('band-acrescimo').textContent = x.acrescimo > 0.005 ? '+' + moeda(x.acrescimo) + ' por causa da bandeira' : 'valor que você digitou';
+
+  if (x.economiaA === null) {
+    document.getElementById('band-a').textContent = '–';
+    document.getElementById('band-a-sub').textContent = 'nenhuma empresa aceita essa conta';
+  } else {
+    document.getElementById('band-a').textContent = moeda(x.economiaA) + '/mês';
+    document.getElementById('band-a-sub').textContent = 'você paga ' + moeda(x.contaComAssinatura);
+  }
+  document.getElementById('band-b').textContent = moeda(x.economiaB) + '/mês';
+  document.getElementById('band-b-sub').textContent = 'você paga ' + moeda(x.contaComPlacas) + ' · retorno em ' + numero(x.paybackB, 1) + ' anos';
+
+  // "Escada": a conta em cada bandeira, separando o que o sol paga do que sobra
+  const todas = BANDEIRAS.map(function (b) { return simularBandeira(resultadoAtual, b.id); });
+  const maior = todas[todas.length - 1].conta;
+  document.getElementById('escada-bandeiras').innerHTML = todas.map(function (t) {
+    const largura = t.conta / maior * 100;
+    const pago = t.contaComPlacas / t.conta * 100;
+    return '<div class="degrau' + (t.bandeira.id === bandeiraAtual ? ' ativo' : '') + '">' +
+             '<span class="degrau-nome"><span class="bolinha b-' + t.bandeira.id + '"></span>' + t.bandeira.nome + '</span>' +
+             '<div class="degrau-trilho"><div class="degrau-barra" style="width:' + largura + '%">' +
+               '<i class="parte-paga" style="width:' + pago + '%"></i><i class="parte-sol"></i>' +
+             '</div></div>' +
+             '<strong>' + moeda(t.conta) + '</strong>' +
+           '</div>';
+  }).join('');
+
+  atualizarAvisoGuardar();
+}
+
+document.getElementById('seletor-bandeira').addEventListener('click', function (evento) {
+  const botao = evento.target.closest('.chip-bandeira');
+  if (!botao) return;
+  bandeiraAtual = botao.dataset.id;
+  atualizarBandeira();
+});
+
+montarSeletorBandeira();
+
+// ---------- EXTRA: comparar cenários ----------
+// Analogia: duas fotos lado a lado. Cada "Guardar" tira uma foto da
+// simulação atual; com duas fotos, a tabela mostra a diferença.
+// Fica só na memória da página (nada é salvo no computador).
+const cenarios = [null, null];
+const NOMES_LIGACAO = { monofasica: 'Monofásica', bifasica: 'Bifásica', trifasica: 'Trifásica' };
+
+function fotografarCenario() {
+  const r = resultadoAtual;
+  const x = simularBandeira(r, bandeiraAtual);
+  const recomendada = r.recomendacao === 'A' ? 'Assinatura' : r.recomendacao === 'B' ? 'Placas' : 'Nenhuma';
+  const economiaRecomendada = r.recomendacao === 'A' ? x.economiaA : r.recomendacao === 'B' ? x.economiaB : 0;
+  return {
+    entrada: entradaAtual.valorConta + '|' + entradaAtual.tipoLigacao + '|' + entradaAtual.imovel + '|' + entradaAtual.areaTelhado + '|' + bandeiraAtual,
+    valorConta: entradaAtual.valorConta,
+    ligacao: NOMES_LIGACAO[entradaAtual.tipoLigacao],
+    imovel: entradaAtual.imovel === 'proprio' ? 'Próprio' : 'Alugado',
+    bandeira: x.bandeira,
+    conta: x.conta,
+    consumo: r.consumo,
+    recomendada,
+    economiaRecomendada,
+    economiaA: x.economiaA,
+    economiaB: x.economiaB,
+    investimento: r.opcaoB.investimento,
+    numPlacas: r.opcaoB.numPlacas,
+    paybackB: x.paybackB,
+    percentualSol: r.cobertura.percentualSol,
+    economia5anos: economiaRecomendada * 60 - (r.recomendacao === 'B' ? r.opcaoB.investimento : 0)
+  };
+}
+
+// Evita guardar duas vezes exatamente a mesma simulação
+function jaGuardado() {
+  if (!resultadoAtual) return false;
+  const chave = fotografarCenario().entrada;
+  return cenarios.some(function (c) { return c && c.entrada === chave; });
+}
+
+function atualizarAvisoGuardar() {
+  const botao = document.getElementById('btn-guardar');
+  const repetido = jaGuardado();
+  botao.disabled = repetido;
+  botao.lastChild.textContent = repetido ? ' Cenário já guardado' : (cenarios[0] && cenarios[1] ? ' Trocar o cenário 2' : ' Guardar este cenário');
+}
+
+document.getElementById('btn-guardar').addEventListener('click', function () {
+  if (!resultadoAtual || jaGuardado()) return;
+  const vaga = cenarios[0] === null ? 0 : 1; // se as duas estão cheias, troca a segunda
+  cenarios[vaga] = fotografarCenario();
+  document.getElementById('aviso-guardado').textContent = vaga === 0
+    ? 'Cenário 1 guardado. Agora mude algum dado no formulário, calcule de novo e guarde o cenário 2.'
+    : 'Cenário 2 guardado. Veja a comparação abaixo.';
+  montarCenarios();
+});
+
+document.getElementById('vagas-cenario').addEventListener('click', function (evento) {
+  const botao = evento.target.closest('[data-remover]');
+  if (botao) {
+    cenarios[Number(botao.dataset.remover)] = null;
+    if (cenarios[0] === null && cenarios[1] !== null) { cenarios[0] = cenarios[1]; cenarios[1] = null; } // sobe o que sobrou
+    document.getElementById('aviso-guardado').textContent = '';
+    montarCenarios();
+    return;
+  }
+  if (evento.target.closest('.vaga-vazia')) document.getElementById('simulador').scrollIntoView({ behavior: 'smooth' });
+});
+
+function montarCenarios() {
+  document.getElementById('vagas-cenario').innerHTML = cenarios.map(function (c, i) {
+    if (!c) {
+      return '<button type="button" class="vaga vaga-vazia"><span class="vaga-numero">' + (i + 1) + '</span>' +
+               '<strong>Cenário ' + (i + 1) + '</strong><span class="dica">' + (i === 0 ? 'Clique em "Guardar este cenário"' : 'Mude os dados e guarde outro') + '</span></button>';
+    }
+    return '<div class="vaga vaga-cheia">' +
+             '<button type="button" class="vaga-remover" data-remover="' + i + '" aria-label="Remover cenário ' + (i + 1) + '">' + icone('x') + '</button>' +
+             '<span class="vaga-numero">' + (i + 1) + '</span>' +
+             '<p class="vaga-rotulo">Conta de ' + moeda(c.valorConta) + '</p>' +
+             '<div class="vaga-tags"><span>' + c.ligacao + '</span><span>' + c.imovel + '</span><span class="tag-bandeira b-' + c.bandeira.id + '">' + c.bandeira.nome + '</span></div>' +
+             '<p class="vaga-valor">' + moeda(c.economiaRecomendada) + '<small>/mês</small></p>' +
+             '<p class="dica">economia com ' + c.recomendada.toLowerCase() + (c.recomendada === 'Nenhuma' ? ' opção disponível' : '') + '</p>' +
+           '</div>';
+  }).join('');
+  montarComparacao();
+  atualizarAvisoGuardar();
+}
+
+// Tabela lado a lado. melhor: 'maior' (quanto mais, melhor), 'menor' ou null (só informação)
+function montarComparacao() {
+  const area = document.getElementById('comparacao');
+  const [c1, c2] = cenarios;
+  if (!c1 || !c2) { area.hidden = true; area.innerHTML = ''; return; }
+
+  const linhas = [
+    { nome: 'Conta com a bandeira', v: function (c) { return c.conta; }, f: moeda, melhor: 'menor' },
+    { nome: 'Consumo estimado', v: function (c) { return c.consumo; }, f: function (v) { return numero(v, 0) + ' kWh'; }, melhor: 'menor' },
+    { nome: 'Opção recomendada', v: function (c) { return c.recomendada; }, f: String, melhor: null },
+    { nome: 'Economia com assinatura', v: function (c) { return c.economiaA; }, f: function (v) { return v === null ? '–' : moeda(v) + '/mês'; }, melhor: 'maior' },
+    { nome: 'Economia com placas', v: function (c) { return c.economiaB; }, f: function (v) { return moeda(v) + '/mês'; }, melhor: 'maior' },
+    { nome: 'Placas necessárias', v: function (c) { return c.numPlacas; }, f: String, melhor: null },
+    { nome: 'Investimento nas placas', v: function (c) { return c.investimento; }, f: moeda, melhor: 'menor' },
+    { nome: 'Retorno do investimento', v: function (c) { return c.paybackB; }, f: function (v) { return isFinite(v) ? numero(v, 1) + ' anos' : '–'; }, melhor: 'menor' },
+    { nome: 'Sol cobre do consumo', v: function (c) { return c.percentualSol; }, f: function (v) { return numero(v, 0) + '%'; }, melhor: 'maior' },
+    { nome: 'Ganho em 5 anos (recomendada)', v: function (c) { return c.economia5anos; }, f: moeda, melhor: 'maior' }
+  ];
+
+  let html = '<table class="tabela-cenarios"><thead><tr><th></th><th><span class="vaga-numero">1</span> Cenário 1</th><th><span class="vaga-numero">2</span> Cenário 2</th><th>Diferença</th></tr></thead><tbody>';
+  linhas.forEach(function (l) {
+    const a = l.v(c1), b = l.v(c2);
+    const numericos = typeof a === 'number' && typeof b === 'number' && isFinite(a) && isFinite(b);
+    let classeA = '', classeB = '', diferenca = '<span class="igual">–</span>';
+    if (numericos && l.melhor && Math.abs(a - b) > 0.004) {
+      const ganhaB = l.melhor === 'maior' ? b > a : b < a;
+      classeA = ganhaB ? '' : ' class="vence"';
+      classeB = ganhaB ? ' class="vence"' : '';
+      const delta = b - a;
+      const texto = (delta > 0 ? '+' : '−') + l.f(Math.abs(delta)).replace('/mês', '');
+      diferenca = '<span class="delta ' + (ganhaB ? 'bom' : 'ruim') + '">' + texto + '</span>';
+    } else if (!numericos && a !== b && a !== null && b !== null) {
+      diferenca = '<span class="igual">mudou</span>';
+    }
+    // data-rotulo aparece só no celular, quando a tabela vira "cartõezinhos"
+    html += '<tr><th scope="row">' + l.nome + '</th><td data-rotulo="Cenário 1"' + classeA + '>' + l.f(a) + '</td><td data-rotulo="Cenário 2"' + classeB + '>' + l.f(b) + '</td><td class="col-diferenca">' + diferenca + '</td></tr>';
+  });
+  html += '</tbody></table><p class="dica legenda-tabela"><span class="vence-exemplo"></span> melhor valor da linha · Diferença = cenário 2 menos cenário 1</p>';
+  area.innerHTML = html;
+  area.hidden = false;
+}
+
+montarCenarios();
+
 // ---------- Botão "Calcular" ----------
 formulario.addEventListener('submit', function (evento) {
   evento.preventDefault(); // não recarrega a página
@@ -355,6 +554,11 @@ formulario.addEventListener('submit', function (evento) {
   desenharGrafico(resultado);
   montarCobertura(resultado);
   montarDiaDeSol(resultado);
+
+  // guarda a simulação para a calculadora de tarifa e os cenários
+  resultadoAtual = resultado;
+  entradaAtual = { valorConta: valorConta, tipoLigacao: tipoLigacao, imovel: imovel, areaTelhado: areaTelhado };
+  atualizarBandeira();
   secaoResultados.scrollIntoView({ behavior: 'smooth' });
 });
 
