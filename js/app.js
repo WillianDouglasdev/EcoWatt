@@ -178,10 +178,12 @@ function desenharGrafico(resultado) {
   const conjuntos = [];
   if (mensalA !== null) {
     conjuntos.push({ label: 'A – Assinatura (' + resultado.opcaoA.melhor.nome + ')', data: linhaA,
-      borderColor: '#F9A825', backgroundColor: '#F9A825', borderWidth: 3, tension: 0.2 });
+      borderColor: '#F9A825', backgroundColor: 'rgba(249, 168, 37, 0.12)', fill: 'origin',
+      borderWidth: 3, tension: 0.3, pointRadius: 4, pointHoverRadius: 7, pointBackgroundColor: '#F9A825' });
   }
   conjuntos.push({ label: 'B – Placas no telhado', data: linhaB,
-    borderColor: '#2E7D32', backgroundColor: '#2E7D32', borderWidth: 3, tension: 0.2 });
+    borderColor: '#2E7D32', backgroundColor: 'rgba(46, 125, 50, 0.12)', fill: 'origin',
+    borderWidth: 3, tension: 0.3, pointRadius: 4, pointHoverRadius: 7, pointBackgroundColor: '#2E7D32' });
 
   if (graficoAtual) graficoAtual.destroy(); // apaga o gráfico anterior
 
@@ -191,11 +193,14 @@ function desenharGrafico(resultado) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false }, // passa o mouse e vê as duas linhas juntas
       plugins: {
+        legend: { position: 'bottom', labels: { usePointStyle: true, padding: 18, font: { weight: '600' } } },
         tooltip: { callbacks: { label: function (item) { return item.dataset.label + ': ' + moeda(item.parsed.y); } } }
       },
       scales: {
-        y: { ticks: { callback: function (v) { return moeda(v); } } }
+        x: { grid: { display: false } },
+        y: { grid: { color: '#ECEFF1' }, ticks: { callback: function (v) { return moeda(v); } } }
       }
     }
   });
@@ -237,6 +242,13 @@ formulario.addEventListener('submit', function (evento) {
 });
 
 // ---------- Vitrine ----------
+// Escolhe um emoji para a "foto" do produto pelo nome (só visual)
+function iconeDoItem(nome) {
+  if (/kit/i.test(nome)) return '📦';
+  if (/inversor/i.test(nome)) return '🔌';
+  return '☀️';
+}
+
 function montarVitrine(categoria) {
   const lista = document.getElementById('lista-vitrine');
   const itens = VITRINE.filter(function (item) {
@@ -246,10 +258,15 @@ function montarVitrine(categoria) {
   lista.innerHTML = itens.map(function (item) {
     const potencia = item.potencia ? '<span class="dica">⚡ ' + item.potencia + '</span>' : '';
     return '<article class="card item-vitrine">' +
-             '<span class="categoria ' + item.categoria + '">' + item.categoria + '</span>' +
-             '<h3>' + item.nome + '</h3>' + potencia +
-             '<span class="preco">' + moeda(item.preco) + '</span>' +
-             '<span class="dica">🏪 ' + item.loja + '</span>' +
+             '<div class="foto">' +
+               '<span class="categoria ' + item.categoria + '">' + item.categoria + '</span>' +
+               iconeDoItem(item.nome) +
+             '</div>' +
+             '<div class="info">' +
+               '<h3>' + item.nome + '</h3>' + potencia +
+               '<span class="preco">' + moeda(item.preco) + '</span>' +
+               '<span class="dica">🏪 ' + item.loja + '</span>' +
+             '</div>' +
            '</article>';
   }).join('');
 }
