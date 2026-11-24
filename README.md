@@ -37,7 +37,7 @@ Um **motor de regras** recomenda a melhor opção (imóvel alugado, fatura míni
 1. Baixe ou clone o repositório.
 2. Dê dois cliques em `index.html`. Pronto: não precisa instalar nada.
 
-Versão publicada (GitHub Pages): https://williandouglasdev.github.io/EcoWatt/
+Versão publicada (GitHub Pages): https://williandouglasdev.github.io/SolNaConta/
 
 ## Estrutura
 
