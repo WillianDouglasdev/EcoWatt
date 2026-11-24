@@ -4,9 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>EcoWatt – Simulador de Energia Limpa</title>
+  <meta name="description" content="Compare a assinatura de energia solar com a instalação de placas e descubra quanto você economiza na conta de luz.">
+  <meta name="theme-color" content="#1B5E20">
+  <!-- Ícone da aba feito com emoji (não precisa de arquivo de imagem) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☀️</text></svg>">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+  <!-- Atalho para quem navega pelo teclado (aparece só ao apertar Tab) -->
+  <a href="#simulador" class="pular">Pular para o simulador</a>
 
   <!-- ===== CABEÇALHO ===== -->
   <header class="topo">
@@ -53,6 +59,7 @@
             </div>
             <p class="exemplo-rodape">🔁 Investimento volta em ~2,1 anos</p>
           </div>
+          <div class="exemplo-chip">☀️ 4 placas · 2,20 kWp</div>
         </div>
       </div>
     </section>
@@ -85,9 +92,9 @@
           <h2>Seus dados</h2>
           <p>Pegue a sua conta de luz e preencha os campos. Em segundos você vê qual opção faz mais sentido para o seu bolso.</p>
           <ul class="lista-check">
-            <li>📍 Atendemos CEPs de Minas Gerais (Cemig)</li>
-            <li>🔒 Nada é salvo: a conta é feita no seu navegador</li>
-            <li>📄 O tipo de ligação está escrito na sua conta</li>
+            <li><span>📍</span><div><strong>Minas Gerais</strong>Atendemos CEPs da área da Cemig (30000-000 a 39999-999).</div></li>
+            <li><span>🔒</span><div><strong>Sem cadastro</strong>Nada é salvo: a conta é feita no seu próprio navegador.</div></li>
+            <li><span>📄</span><div><strong>Tenha a conta em mãos</strong>O valor e o tipo de ligação estão impressos nela.</div></li>
           </ul>
         </div>
 
@@ -96,7 +103,7 @@
             <div class="campo">
               <label for="cep">CEP</label>
               <input type="text" id="cep" inputmode="numeric" placeholder="30000-000" maxlength="9" autocomplete="postal-code">
-              <small class="erro" id="erro-cep"></small>
+              <small class="erro" id="erro-cep" aria-live="polite"></small>
             </div>
 
             <div class="campo">
@@ -105,7 +112,7 @@
                 <span>R$</span>
                 <input type="number" id="valorConta" min="0" step="0.01" placeholder="Ex.: 300">
               </div>
-              <small class="erro" id="erro-valorConta"></small>
+              <small class="erro" id="erro-valorConta" aria-live="polite"></small>
             </div>
           </div>
 
@@ -139,7 +146,7 @@
         <h2>Seu resultado</h2>
 
         <!-- Destaque principal: a economia em R$ -->
-        <div class="destaque-economia card">
+        <div class="destaque-economia card" aria-live="polite">
           <span class="destaque-icone" aria-hidden="true">☀️</span>
           <p id="destaque-titulo">Você pode economizar até</p>
           <p class="valor-economia" id="destaque-valor">R$ 0,00</p>
@@ -200,7 +207,8 @@
   <footer class="rodape">
     <div class="container">
       <p class="logo logo-rodape"><span class="logo-icone">☀️</span><span class="logo-texto">Eco<b>Watt</b></span></p>
-      <p>Projeto acadêmico UPX 3 · Cidades Inteligentes · ODS 7 (Energia limpa e acessível)</p>
+      <p class="selo-ods">ODS 7 · Energia limpa e acessível</p>
+      <p>Projeto acadêmico UPX 3 · Cidades Inteligentes</p>
       <p class="dica">Simulação estimada. Os valores reais dependem do seu telhado, da distribuidora e da empresa escolhida.</p>
     </div>
   </footer>

@@ -87,18 +87,27 @@ function montarCardA(opcaoA) {
   }
 
   // Lista todas as empresas, mostrando quem aceita e quem não aceita
+  // Cada linha: nome + etiqueta à esquerda, economia à direita (como um extrato)
+  html += '<div class="lista-empresas">';
   opcaoA.empresas.forEach(function (empresa) {
-    const classe = empresa.elegivel ? 'empresa' : 'empresa inelegivel';
+    const ehMelhor = opcaoA.melhor && empresa.nome === opcaoA.melhor.nome;
+    let classe = 'empresa';
+    if (!empresa.elegivel) classe += ' inelegivel';
+    if (ehMelhor) classe += ' melhor';
     const etiqueta = empresa.elegivel
-      ? '<span class="etiqueta">Elegível</span>'
-      : '<span class="etiqueta nao">Conta mínima ' + moeda(empresa.faturaMinima) + '</span>';
-    const economia = empresa.elegivel
-      ? moeda(empresa.economiaMensal) + '/mês (' + numero(empresa.desconto * 100, 0) + '% de desconto)'
-      : 'Não disponível para o seu valor de conta';
-    const link = empresa.site ? ' · <a href="' + empresa.site + '" target="_blank" rel="noopener">site</a>' : '';
-    html += '<div class="' + classe + '"><span class="nome">' + empresa.nome + '</span>' + etiqueta +
-            '<br><span class="dica">' + economia + link + '</span></div>';
+      ? '<span class="etiqueta">' + numero(empresa.desconto * 100, 0) + '% off</span>'
+      : '<span class="etiqueta nao">Conta mín. ' + moeda(empresa.faturaMinima) + '</span>';
+    const valor = empresa.elegivel
+      ? '<strong class="empresa-valor">' + moeda(empresa.economiaMensal) + '<small>/mês</small></strong>'
+      : '<strong class="empresa-valor">–</strong>';
+    const link = empresa.site ? '<a href="' + empresa.site + '" target="_blank" rel="noopener">Ver site ↗</a>' : '';
+    html += '<div class="' + classe + '">' +
+              '<div><span class="nome">' + empresa.nome + '</span>' + etiqueta +
+              '<span class="empresa-link">' + (empresa.elegivel ? link : 'Não disponível para o seu valor de conta') + '</span></div>' +
+              valor +
+            '</div>';
   });
+  html += '</div>';
 
   document.getElementById('conteudo-a').innerHTML = html;
 }
@@ -151,6 +160,13 @@ function montarDestaque(resultado) {
   }
 }
 
+// Eixo do gráfico mais limpo: "R$ 8 mil" em vez de "R$ 8.000,00"
+function eixoCurto(valor) {
+  if (valor === 0) return 'R$ 0';
+  if (Math.abs(valor) >= 1000) return 'R$ ' + numero(valor / 1000, 0) + ' mil';
+  return moeda(valor);
+}
+
 // ---------- Gráfico (Chart.js): ganho acumulado ano a ano ----------
 // Analogia: é como comparar dois cofrinhos. No A você começa do zero e enche
 // um pouco por mês. No B você começa "devendo" o investimento, mas enche mais rápido.
@@ -162,6 +178,9 @@ function desenharGrafico(resultado) {
     document.getElementById('aviso-grafico').textContent = 'Não foi possível carregar o gráfico (verifique a internet).';
     return;
   }
+
+  Chart.defaults.font.family = 'system-ui, "Segoe UI", Arial, sans-serif'; // mesma fonte do site
+  Chart.defaults.color = '#5F7380';
 
   const horizonte = (typeof PARAMETROS !== 'undefined' && PARAMETROS.horizonteAnos) || 5;
   const rotulos = [];
@@ -195,12 +214,13 @@ function desenharGrafico(resultado) {
       maintainAspectRatio: false,
       interaction: { mode: 'index', intersect: false }, // passa o mouse e vê as duas linhas juntas
       plugins: {
-        legend: { position: 'bottom', labels: { usePointStyle: true, padding: 18, font: { weight: '600' } } },
-        tooltip: { callbacks: { label: function (item) { return item.dataset.label + ': ' + moeda(item.parsed.y); } } }
+        legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, boxHeight: 8, padding: 18, font: { weight: '600' } } },
+        tooltip: { backgroundColor: '#263238', padding: 12, cornerRadius: 10, boxPadding: 4, usePointStyle: true,
+          callbacks: { label: function (item) { return item.dataset.label + ': ' + moeda(item.parsed.y); } } }
       },
       scales: {
         x: { grid: { display: false } },
-        y: { grid: { color: '#ECEFF1' }, ticks: { callback: function (v) { return moeda(v); } } }
+        y: { grid: { color: function (ctx) { return ctx.tick && ctx.tick.value === 0 ? '#90A4AE' : '#ECEFF1'; } }, ticks: { callback: function (v) { return eixoCurto(v); } } }
       }
     }
   });
@@ -237,6 +257,9 @@ formulario.addEventListener('submit', function (evento) {
   }
 
   secaoResultados.hidden = false;
+  secaoResultados.classList.remove('animar');
+  void secaoResultados.offsetWidth; // truque para o navegador reiniciar a animação
+  secaoResultados.classList.add('animar');
   desenharGrafico(resultado);
   secaoResultados.scrollIntoView({ behavior: 'smooth' });
 });
@@ -282,3 +305,9 @@ document.getElementById('filtros').addEventListener('click', function (evento) {
 
 // Mostra a vitrine assim que a página abre
 montarVitrine('todos');
+
+// ---------- Cabeçalho ganha sombra quando a página rola ----------
+const topo = document.querySelector('.topo');
+window.addEventListener('scroll', function () {
+  topo.classList.toggle('rolou', window.scrollY > 8);
+}, { passive: true });
