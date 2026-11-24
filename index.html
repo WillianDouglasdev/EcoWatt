@@ -11,10 +11,11 @@
   <!-- ===== CABEÇALHO ===== -->
   <header class="topo">
     <div class="container topo-conteudo">
-      <a href="#inicio" class="logo">☀️ EcoWatt</a>
+      <a href="#inicio" class="logo"><span class="logo-icone">☀️</span><span class="logo-texto">Eco<b>Watt</b></span></a>
       <nav class="menu">
-        <a href="#simulador">Simular</a>
-        <a href="#vitrine">Vitrine</a>
+        <a href="#como-funciona" class="menu-link">Como funciona</a>
+        <a href="#vitrine" class="menu-link">Vitrine</a>
+        <a href="#simulador" class="botao botao-amarelo botao-pequeno">Simular</a>
       </nav>
     </div>
   </header>
@@ -22,30 +23,90 @@
   <main>
     <!-- ===== SEÇÃO 1: INÍCIO ===== -->
     <section id="inicio" class="hero">
+      <div class="container hero-grade">
+        <div class="hero-texto">
+          <span class="hero-etiqueta">⚡ Simulador gratuito · Cemig / MG</span>
+          <h1>Descubra quanto você economiza com <span class="destaque-sol">energia solar</span></h1>
+          <p>Compare em segundos a <strong>assinatura de energia solar</strong> (sem obra) com a
+            <strong>instalação de placas</strong> no seu telhado. Grátis e sem cadastro.</p>
+          <div class="hero-acoes">
+            <a href="#simulador" class="botao botao-amarelo">⚡ Fazer simulação</a>
+            <a href="#como-funciona" class="botao botao-contorno">Como funciona</a>
+          </div>
+          <ul class="hero-vantagens">
+            <li>✔ Sem cadastro</li>
+            <li>✔ Resultado na hora</li>
+            <li>✔ Duas opções lado a lado</li>
+          </ul>
+        </div>
+
+        <!-- Cartão ilustrativo (exemplo do Perfil 2 dos testes) -->
+        <div class="hero-exemplo" aria-hidden="true">
+          <div class="sol-decorativo"></div>
+          <div class="exemplo-card">
+            <p class="exemplo-rotulo">Exemplo: conta de R$ 300</p>
+            <p class="exemplo-valor">R$ 216,90<small>/mês</small></p>
+            <p class="exemplo-sub">de economia com placas no telhado</p>
+            <div class="exemplo-barras">
+              <div><span>Assinatura</span><div class="barra"><i style="width: 22%"></i></div><b>R$ 48</b></div>
+              <div><span>Placas</span><div class="barra barra-verde"><i style="width: 100%"></i></div><b>R$ 217</b></div>
+            </div>
+            <p class="exemplo-rodape">🔁 Investimento volta em ~2,1 anos</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== COMO FUNCIONA ===== -->
+    <section id="como-funciona" class="secao secao-passos">
       <div class="container">
-        <h1>Descubra quanto você economiza com energia solar</h1>
-        <p>Compare em segundos a <strong>assinatura de energia solar</strong> (sem obra) com a
-          <strong>instalação de placas</strong> no seu telhado. Grátis e sem cadastro.</p>
-        <a href="#simulador" class="botao botao-amarelo">⚡ Fazer simulação</a>
+        <div class="passos">
+          <div class="passo">
+            <span class="passo-icone">🏠</span>
+            <div><h3>1. Conte sobre sua casa</h3><p>CEP, valor da conta de luz e tipo de ligação.</p></div>
+          </div>
+          <div class="passo">
+            <span class="passo-icone">⚖️</span>
+            <div><h3>2. Compare as opções</h3><p>Assinatura solar ou placas próprias, lado a lado.</p></div>
+          </div>
+          <div class="passo">
+            <span class="passo-icone">💰</span>
+            <div><h3>3. Veja quanto economiza</h3><p>Economia por mês, em 12 meses e em 5 anos.</p></div>
+          </div>
+        </div>
       </div>
     </section>
 
     <!-- ===== SEÇÃO 2: FORMULÁRIO ===== -->
     <section id="simulador" class="secao">
-      <div class="container">
-        <h2>🏠 Seus dados</h2>
+      <div class="container simulador-grade">
+        <div class="simulador-intro">
+          <span class="sobretitulo">Simulação</span>
+          <h2>Seus dados</h2>
+          <p>Pegue a sua conta de luz e preencha os campos. Em segundos você vê qual opção faz mais sentido para o seu bolso.</p>
+          <ul class="lista-check">
+            <li>📍 Atendemos CEPs de Minas Gerais (Cemig)</li>
+            <li>🔒 Nada é salvo: a conta é feita no seu navegador</li>
+            <li>📄 O tipo de ligação está escrito na sua conta</li>
+          </ul>
+        </div>
+
         <form id="formulario" class="card formulario" novalidate>
+          <div class="formulario-grade">
+            <div class="campo">
+              <label for="cep">CEP</label>
+              <input type="text" id="cep" inputmode="numeric" placeholder="30000-000" maxlength="9" autocomplete="postal-code">
+              <small class="erro" id="erro-cep"></small>
+            </div>
 
-          <div class="campo">
-            <label for="cep">CEP</label>
-            <input type="text" id="cep" inputmode="numeric" placeholder="30000-000" maxlength="9" autocomplete="postal-code">
-            <small class="erro" id="erro-cep"></small>
-          </div>
-
-          <div class="campo">
-            <label for="valorConta">Valor médio da conta de luz (R$)</label>
-            <input type="number" id="valorConta" min="0" step="0.01" placeholder="Ex.: 300">
-            <small class="erro" id="erro-valorConta"></small>
+            <div class="campo">
+              <label for="valorConta">Valor médio da conta de luz</label>
+              <div class="campo-prefixo">
+                <span>R$</span>
+                <input type="number" id="valorConta" min="0" step="0.01" placeholder="Ex.: 300">
+              </div>
+              <small class="erro" id="erro-valorConta"></small>
+            </div>
           </div>
 
           <div class="campo">
@@ -61,8 +122,8 @@
           <fieldset class="campo">
             <legend>O imóvel é</legend>
             <div class="opcoes-radio">
-              <label><input type="radio" name="imovel" value="proprio" checked> Próprio</label>
-              <label><input type="radio" name="imovel" value="alugado"> Alugado</label>
+              <label class="pilula"><input type="radio" name="imovel" value="proprio" checked><span>🏠 Próprio</span></label>
+              <label class="pilula"><input type="radio" name="imovel" value="alugado"><span>🔑 Alugado</span></label>
             </div>
           </fieldset>
 
@@ -74,10 +135,12 @@
     <!-- ===== SEÇÃO 3: RESULTADOS (escondida até calcular) ===== -->
     <section id="resultados" class="secao secao-clara" hidden>
       <div class="container">
-        <h2>💰 Seu resultado</h2>
+        <span class="sobretitulo">Resultado</span>
+        <h2>Seu resultado</h2>
 
         <!-- Destaque principal: a economia em R$ -->
         <div class="destaque-economia card">
+          <span class="destaque-icone" aria-hidden="true">☀️</span>
           <p id="destaque-titulo">Você pode economizar até</p>
           <p class="valor-economia" id="destaque-valor">R$ 0,00</p>
           <p id="destaque-sub">por mês</p>
@@ -89,14 +152,14 @@
         <div class="grade-opcoes">
           <article class="card opcao" id="card-a">
             <span class="selo" hidden>⭐ Recomendado</span>
-            <h3>Opção A – Assinatura solar</h3>
+            <div class="opcao-topo"><span class="opcao-icone">📄</span><div><span class="opcao-letra">Opção A</span><h3>Assinatura solar</h3></div></div>
             <p class="descricao">Você paga uma mensalidade e recebe desconto na conta. Sem obra, serve para imóvel alugado.</p>
             <div id="conteudo-a"></div>
           </article>
 
           <article class="card opcao" id="card-b">
             <span class="selo" hidden>⭐ Recomendado</span>
-            <h3>Opção B – Placas no telhado</h3>
+            <div class="opcao-topo"><span class="opcao-icone">🏠</span><div><span class="opcao-letra">Opção B</span><h3>Placas no telhado</h3></div></div>
             <p class="descricao">Você compra e instala o sistema. Investimento inicial maior, economia maior.</p>
             <div id="conteudo-b"></div>
           </article>
@@ -105,7 +168,7 @@
         <p class="motivo" id="motivo"></p>
 
         <!-- Gráfico de comparação -->
-        <div class="card">
+        <div class="card card-grafico">
           <h3>📈 Ganho acumulado em 5 anos</h3>
           <div class="area-grafico">
             <canvas id="grafico"></canvas>
@@ -113,15 +176,16 @@
           <p class="dica" id="aviso-grafico">Na opção B a linha começa negativa por causa do investimento e sobe com a economia mensal.</p>
         </div>
 
-        <p class="dica">Consumo estimado: <strong id="consumo">–</strong> por mês.</p>
+        <p class="consumo-chip">⚡ Consumo estimado: <strong id="consumo">–</strong> por mês</p>
       </div>
     </section>
 
     <!-- ===== SEÇÃO 4: VITRINE ===== -->
     <section id="vitrine" class="secao">
       <div class="container">
-        <h2>🛒 Vitrine de equipamentos</h2>
-        <p class="aviso">Preços ilustrativos para fins acadêmicos.</p>
+        <span class="sobretitulo">Vitrine</span>
+        <h2>Equipamentos para começar</h2>
+        <p class="aviso">ℹ️ Preços ilustrativos para fins acadêmicos.</p>
         <div class="filtros" id="filtros">
           <button type="button" class="filtro ativo" data-categoria="todos">Todos</button>
           <button type="button" class="filtro" data-categoria="novo">Novos</button>
@@ -135,7 +199,8 @@
 
   <footer class="rodape">
     <div class="container">
-      <p>EcoWatt – Projeto acadêmico UPX 3 · Cidades Inteligentes · ODS 7 (Energia limpa e acessível)</p>
+      <p class="logo logo-rodape"><span class="logo-icone">☀️</span><span class="logo-texto">Eco<b>Watt</b></span></p>
+      <p>Projeto acadêmico UPX 3 · Cidades Inteligentes · ODS 7 (Energia limpa e acessível)</p>
       <p class="dica">Simulação estimada. Os valores reais dependem do seu telhado, da distribuidora e da empresa escolhida.</p>
     </div>
   </footer>
