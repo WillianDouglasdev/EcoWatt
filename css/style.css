@@ -399,7 +399,16 @@ fieldset.campo { margin-top: 4px; }
 .item-vitrine .foto { position: relative; display: grid; place-items: center; height: 132px; font-size: 3.4rem; background: linear-gradient(145deg, var(--verde-claro), #F4FAF4); }
 .item-vitrine:has(.categoria.usado) .foto { background: linear-gradient(145deg, #FFF3CD, #FFFBEF); }
 .item-vitrine:has(.categoria.recondicionado) .foto { background: linear-gradient(145deg, #E1EFFC, #F5FAFF); }
-.item-vitrine .foto .categoria { position: absolute; top: 14px; left: 14px; }
+.item-vitrine .foto .categoria { position: absolute; top: 14px; left: 14px; z-index: 1; }
+/* Foto real do produto; o ícone só aparece se a foto não carregar (.sem-foto) */
+.item-vitrine .foto { height: 180px; overflow: hidden; }
+.item-vitrine .foto img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+.item-vitrine:hover .foto img { transform: scale(1.04); }
+.item-vitrine .foto:not(.sem-foto) > .icone { display: none; }
+.item-vitrine .foto.sem-foto img { display: none; }
+.creditos-fotos { margin-top: 20px; font-size: 0.8rem; color: var(--texto-suave); line-height: 1.6; }
+.creditos-fotos a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.creditos-fotos a:hover { color: var(--verde); }
 .item-vitrine .info { display: flex; flex-direction: column; gap: 6px; padding: 20px 22px 22px; flex: 1; }
 .item-vitrine h3 { font-size: 1rem; margin: 0; line-height: 1.35; letter-spacing: -0.01em; }
 .item-vitrine .preco { font-size: 1.5rem; font-weight: 800; color: var(--texto); margin-top: auto; padding-top: 10px; letter-spacing: -0.02em; }

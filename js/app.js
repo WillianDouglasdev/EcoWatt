@@ -271,11 +271,18 @@ formulario.addEventListener('submit', function (evento) {
 });
 
 // ---------- Vitrine ----------
-// Escolhe o ícone da "foto" do produto pelo nome (só visual)
+// Escolhe o ícone do produto pelo nome (usado se a foto não carregar)
 function iconeDoItem(nome) {
   if (/kit/i.test(nome)) return icone('caixa');
   if (/inversor/i.test(nome)) return icone('inversor');
   return icone('painel');
+}
+
+// Fotos reais (livres, Wikimedia Commons). Créditos no fim da vitrine.
+function fotoDoItem(nome) {
+  if (/kit/i.test(nome)) return 'img/kit-solar.jpg';
+  if (/inversor/i.test(nome)) return 'img/inversor.jpg';
+  return 'img/placa-solar.jpg';
 }
 
 function montarVitrine(categoria) {
@@ -286,8 +293,11 @@ function montarVitrine(categoria) {
 
   lista.innerHTML = itens.map(function (item) {
     const potencia = item.potencia ? '<span class="dica">' + icone('raio') + ' ' + item.potencia + '</span>' : '';
+    // Se a foto falhar, a classe "sem-foto" esconde a imagem e mostra o ícone
     return '<article class="card item-vitrine">' +
              '<div class="foto">' +
+               '<img src="' + fotoDoItem(item.nome) + '" alt="Foto ilustrativa: ' + item.nome + '" loading="lazy" ' +
+                    'onerror="this.parentNode.classList.add(\'sem-foto\')">' +
                '<span class="categoria ' + item.categoria + '">' + item.categoria + '</span>' +
                iconeDoItem(item.nome) +
              '</div>' +
