@@ -45,6 +45,8 @@
     <symbol id="i-colunas" viewBox="0 0 24 24"><rect x="3" y="4" width="7.5" height="16" rx="1.5"/><rect x="13.5" y="4" width="7.5" height="16" rx="1.5"/><path d="M5.5 9h2.5M16 9h2.5M5.5 13h2.5M16 13h2.5"/></symbol>
     <symbol id="i-mais" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
     <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+    <symbol id="i-arvore" viewBox="0 0 24 24"><path d="M12 22v-6M12 16c-4 0-7-2.5-7-6 0-2.6 1.7-4.4 3.5-5A4.5 4.5 0 0 1 17 6c1.5.8 2 2.2 2 4 0 3.5-3 6-7 6z"/></symbol>
+    <symbol id="i-nuvem" viewBox="0 0 24 24"><path d="M7 18a4.5 4.5 0 0 1-.5-9A6 6 0 0 1 18 8.5a4.5 4.5 0 0 1-.5 9.5z"/><path d="M9 13.5h6"/></symbol>
     <symbol id="i-loja" viewBox="0 0 24 24"><path d="M3 9l1.5-5h15L21 9M3 9a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0M5 11.5V20h14v-8.5M10 20v-5h4v5"/></symbol>
   </svg>
 
@@ -66,18 +68,19 @@
     <section id="inicio" class="hero">
       <div class="container hero-grade">
         <div class="hero-texto">
-          <span class="hero-etiqueta"><svg class="icone" aria-hidden="true"><use href="#i-raio"/></svg> Simulador gratuito · Cemig / MG</span>
+          <span class="hero-etiqueta"><svg class="icone" aria-hidden="true"><use href="#i-raio"/></svg> Simulador gratuito para Minas Gerais</span>
           <h1>Descubra quanto o <span class="destaque-sol">sol</span> pode tirar da sua conta de luz</h1>
-          <p>Compare em segundos a <strong>assinatura de energia solar</strong> (sem obra) com a
-            <strong>instalação de placas</strong> no seu telhado. Grátis e sem cadastro.</p>
+          <p>Energia limpa não é só para quem tem dinheiro sobrando. Mostre sua conta de luz e descubra,
+            em menos de um minuto, se vale mais <strong>assinar energia solar sem obra</strong> ou
+            <strong>instalar placas no seu telhado</strong>, e quanto isso ajuda o planeta.</p>
           <div class="hero-acoes">
-            <a href="#simulador" class="botao botao-amarelo">Fazer simulação <svg class="icone" aria-hidden="true"><use href="#i-seta"/></svg></a>
+            <a href="#simulador" class="botao botao-amarelo">Quero ver minha economia <svg class="icone" aria-hidden="true"><use href="#i-seta"/></svg></a>
             <a href="#como-funciona" class="botao botao-contorno">Como funciona</a>
           </div>
           <ul class="hero-vantagens">
             <li><svg class="icone" aria-hidden="true"><use href="#i-check"/></svg> Sem cadastro</li>
             <li><svg class="icone" aria-hidden="true"><use href="#i-check"/></svg> Resultado na hora</li>
-            <li><svg class="icone" aria-hidden="true"><use href="#i-check"/></svg> Duas opções lado a lado</li>
+            <li><svg class="icone" aria-hidden="true"><use href="#i-check"/></svg> Mostra seu impacto no planeta</li>
           </ul>
         </div>
 
@@ -105,30 +108,72 @@
         <div class="passos">
           <div class="passo">
             <span class="passo-icone"><svg class="icone" aria-hidden="true"><use href="#i-casa"/></svg></span>
-            <div><h3>1. Conte sobre sua casa</h3><p>CEP, valor da conta de luz e tipo de ligação.</p></div>
+            <div><h3>1. Escolha seu objetivo</h3><p>Economizar sem obra ou gerar a própria energia.</p></div>
           </div>
           <div class="passo">
             <span class="passo-icone"><svg class="icone" aria-hidden="true"><use href="#i-balanca"/></svg></span>
-            <div><h3>2. Compare as opções</h3><p>Assinatura solar ou placas próprias, lado a lado.</p></div>
+            <div><h3>2. Mostre sua conta</h3><p>Só o valor, o CEP e o tipo de ligação.</p></div>
           </div>
           <div class="passo">
             <span class="passo-icone"><svg class="icone" aria-hidden="true"><use href="#i-moeda"/></svg></span>
-            <div><h3>3. Veja quanto economiza</h3><p>Economia por mês, em 12 meses e em 5 anos.</p></div>
+            <div><h3>3. Veja o que você ganha</h3><p>Economia em reais e o CO₂ que deixa de ir para o ar.</p></div>
           </div>
         </div>
       </div>
     </section>
 
     <!-- ===== SEÇÃO 2: FORMULÁRIO ===== -->
-    <section id="simulador" class="secao">
-      <div class="container simulador-grade">
-        <div class="simulador-intro">
+    <section id="simulador" class="secao secao-simulador">
+      <div class="container">
+        <!-- ETAPA 1: perfil do cliente. Analogia: é o garçom perguntando
+             "vai querer o prato do dia ou à la carte?" antes de anotar o pedido. -->
+        <div class="cabecalho-simulador">
           <span class="sobretitulo">Simulação</span>
-          <h2>Seus dados</h2>
-          <p>Pegue a sua conta de luz e preencha os campos. Em segundos você vê qual opção faz mais sentido para o seu bolso.</p>
+          <h2>Vamos descobrir quanto você pode economizar?</h2>
+          <p>São três passos rápidos. Para começar, conte o que você procura.</p>
+          <ol class="etapas" id="etapas">
+            <li class="ativa"><span>1</span> Seu objetivo</li>
+            <li><span>2</span> Sua conta</li>
+            <li><span>3</span> Sua economia</li>
+          </ol>
+        </div>
+
+        <div class="perfis" id="perfis" role="radiogroup" aria-label="Qual é o seu objetivo?">
+          <button type="button" class="perfil perfil-assinatura" role="radio" aria-checked="false" data-perfil="assinatura">
+            <span class="perfil-topo"><span class="perfil-icone"><svg class="icone" aria-hidden="true"><use href="#i-documento"/></svg></span><span class="perfil-tag">Sem obra · sem investimento</span></span>
+            <strong class="perfil-titulo">Quero economizar sem obra</strong>
+            <span class="perfil-texto">Assine a energia de uma fazenda solar e ganhe desconto na conta todo mês. Serve até para quem mora de aluguel.</span>
+            <span class="perfil-lista">
+              <span><svg class="icone" aria-hidden="true"><use href="#i-check"/></svg> Desconto já nas próximas contas</span>
+              <span><svg class="icone" aria-hidden="true"><use href="#i-check"/></svg> Nada para instalar no telhado</span>
+              <span><svg class="icone" aria-hidden="true"><use href="#i-check"/></svg> Ideal para imóvel alugado</span>
+            </span>
+            <span class="perfil-cta">Ver meu desconto <svg class="icone" aria-hidden="true"><use href="#i-seta"/></svg></span>
+          </button>
+          <button type="button" class="perfil perfil-placas" role="radio" aria-checked="false" data-perfil="placas">
+            <span class="perfil-topo"><span class="perfil-icone"><svg class="icone" aria-hidden="true"><use href="#i-painel"/></svg></span><span class="perfil-tag">Maior economia no longo prazo</span></span>
+            <strong class="perfil-titulo">Quero gerar minha própria energia</strong>
+            <span class="perfil-texto">Descubra quantas placas sua casa precisa, quanto custa instalar e em quanto tempo o dinheiro volta para o seu bolso.</span>
+            <span class="perfil-lista">
+              <span><svg class="icone" aria-hidden="true"><use href="#i-check"/></svg> A maior economia por mês</span>
+              <span><svg class="icone" aria-hidden="true"><use href="#i-check"/></svg> Investimento que se paga em poucos anos</span>
+              <span><svg class="icone" aria-hidden="true"><use href="#i-check"/></svg> Energia limpa saindo do seu telhado</span>
+            </span>
+            <span class="perfil-cta">Ver quanto custa <svg class="icone" aria-hidden="true"><use href="#i-seta"/></svg></span>
+          </button>
+        </div>
+        <p class="dica dica-perfis" id="dica-perfis">Na dúvida? Escolha qualquer um: no fim mostramos as duas opções lado a lado.</p>
+      </div>
+
+      <!-- ETAPA 2: dados da conta (aparece depois de escolher o perfil) -->
+      <div class="container simulador-grade" id="etapa-dados" hidden>
+        <div class="simulador-intro">
+          <button type="button" class="perfil-escolhido" id="perfil-escolhido"><span id="perfil-escolhido-texto">Objetivo</span> <small>trocar</small></button>
+          <h2 id="titulo-dados">Agora, sua conta de luz</h2>
+          <p id="texto-dados">Pegue a sua conta de luz e preencha os campos. Em segundos você vê quanto pode economizar.</p>
           <ul class="lista-check">
             <li><span><svg class="icone" aria-hidden="true"><use href="#i-pino"/></svg></span><div><strong>Minas Gerais</strong>Atendemos CEPs da área da Cemig (30000-000 a 39999-999).</div></li>
-            <li><span><svg class="icone" aria-hidden="true"><use href="#i-cadeado"/></svg></span><div><strong>Sem cadastro</strong>Nada é salvo: a conta é feita no seu próprio navegador.</div></li>
+            <li><span><svg class="icone" aria-hidden="true"><use href="#i-cadeado"/></svg></span><div><strong>Sem cadastro, sem ligação de vendedor</strong>Nada é salvo: a conta é feita no seu próprio navegador.</div></li>
             <li><span><svg class="icone" aria-hidden="true"><use href="#i-documento"/></svg></span><div><strong>Tenha a conta em mãos</strong>O valor e o tipo de ligação estão impressos nela.</div></li>
           </ul>
         </div>
@@ -161,7 +206,7 @@
             <small class="dica">Está escrito na sua conta de luz.</small>
           </div>
 
-          <div class="campo">
+          <div class="campo" id="campo-area">
             <label for="areaTelhado">Área livre no telhado <span class="opcional">(opcional)</span></label>
             <div class="campo-prefixo campo-sufixo">
               <input type="number" id="areaTelhado" min="0" step="1" placeholder="Ex.: 20">
@@ -179,7 +224,7 @@
             </div>
           </fieldset>
 
-          <button type="submit" class="botao botao-verde">Calcular economia <svg class="icone" aria-hidden="true"><use href="#i-seta"/></svg></button>
+          <button type="submit" class="botao botao-verde" id="botao-calcular"><span id="texto-botao">Ver minha economia</span> <svg class="icone" aria-hidden="true"><use href="#i-seta"/></svg></button>
         </form>
       </div>
     </section>
@@ -187,32 +232,74 @@
     <!-- ===== SEÇÃO 3: RESULTADOS (escondida até calcular) ===== -->
     <section id="resultados" class="secao secao-clara" hidden>
       <div class="container">
-        <span class="sobretitulo">Resultado</span>
-        <h2>Seu resultado</h2>
+        <span class="sobretitulo">Sua economia</span>
+        <h2 id="titulo-resultado">Olha só o que o sol pode fazer por você</h2>
 
         <!-- Destaque principal: a economia em R$ -->
         <div class="destaque-economia card" aria-live="polite">
-          <span class="destaque-icone"><svg class="icone" aria-hidden="true"><use href="#i-sol"/></svg></span>
+          <span class="destaque-perfil" id="destaque-perfil"></span>
           <p id="destaque-titulo">Você pode economizar até</p>
           <p class="valor-economia" id="destaque-valor">R$ 0,00</p>
           <p id="destaque-sub">por mês</p>
+
+          <!-- Antes x depois: a conta de hoje e a conta com a opção escolhida -->
+          <div class="antes-depois" id="antes-depois">
+            <div class="ad-linha">
+              <span class="ad-rotulo">Hoje você paga</span>
+              <div class="ad-trilho"><i class="ad-antes" style="width: 100%"></i></div>
+              <strong id="ad-antes">–</strong>
+            </div>
+            <div class="ad-linha">
+              <span class="ad-rotulo" id="ad-depois-rotulo">Com o sol</span>
+              <div class="ad-trilho"><i class="ad-depois" id="ad-depois-barra"></i></div>
+              <strong id="ad-depois">–</strong>
+            </div>
+            <span class="ad-selo" id="ad-selo"></span>
+          </div>
+
+          <div class="destaque-extras" id="destaque-extras"></div>
+        </div>
+
+        <p class="dica-perfil" id="dica-perfil" hidden></p>
+
+        <!-- Impacto ambiental (ODS 7 e 11) -->
+        <div class="card card-impacto" id="card-impacto">
+          <div class="impacto-cabecalho">
+            <span class="impacto-icone"><svg class="icone" aria-hidden="true"><use href="#i-folha"/></svg></span>
+            <div>
+              <h3>Seu impacto no planeta</h3>
+              <p id="impacto-texto">Com energia solar, sua casa passa a usar energia limpa e evita emissões.</p>
+            </div>
+            <span class="impacto-ods">ODS 7 · 11</span>
+          </div>
+          <div class="impacto-numeros">
+            <div><span class="impacto-mini"><svg class="icone" aria-hidden="true"><use href="#i-raio"/></svg></span><strong id="imp-kwh">–</strong><p>de energia limpa por ano</p></div>
+            <div><span class="impacto-mini"><svg class="icone" aria-hidden="true"><use href="#i-nuvem"/></svg></span><strong id="imp-co2">–</strong><p>de CO₂ a menos no ar por ano</p></div>
+            <div><span class="impacto-mini"><svg class="icone" aria-hidden="true"><use href="#i-arvore"/></svg></span><strong id="imp-arvores">–</strong><p>o mesmo que essas árvores fixam em um ano</p></div>
+            <div><span class="impacto-mini"><svg class="icone" aria-hidden="true"><use href="#i-sol"/></svg></span><strong id="imp-vida">–</strong><p>de CO₂ evitado em 25 anos</p></div>
+          </div>
+          <div class="floresta" id="floresta" aria-hidden="true"></div>
+          <p class="dica fonte">A energia do Brasil já é uma das mais limpas do mundo, por isso cada kWh evita pouco CO₂; o ganho está em somar casas. Fator de emissão: MCTI, média do sistema elétrico (0,0289 kg CO₂/kWh). Árvore: 7 kg de CO₂ por ano (espécies da Mata Atlântica, 140 kg em 20 anos).</p>
         </div>
 
         <p class="aviso" id="aviso-geral" hidden></p>
 
         <!-- Cards das duas opções -->
-        <div class="grade-opcoes">
+        <h3 class="titulo-comparar">Compare as duas opções</h3>
+        <div class="grade-opcoes" id="grade-opcoes">
           <article class="card opcao" id="card-a">
             <span class="selo" hidden><svg class="icone" aria-hidden="true"><use href="#i-estrela"/></svg> Recomendado</span>
             <div class="opcao-topo"><span class="opcao-icone"><svg class="icone" aria-hidden="true"><use href="#i-documento"/></svg></span><div><span class="opcao-letra">Opção A</span><h3>Assinatura solar</h3></div></div>
-            <p class="descricao">Você paga uma mensalidade e recebe desconto na conta. Sem obra, serve para imóvel alugado.</p>
+            <span class="tag-objetivo">Seu objetivo</span>
+            <p class="descricao">Você assina a energia de uma fazenda solar e ganha desconto na conta. Sem obra, sem investimento e serve para imóvel alugado.</p>
             <div id="conteudo-a"></div>
           </article>
 
           <article class="card opcao" id="card-b">
             <span class="selo" hidden><svg class="icone" aria-hidden="true"><use href="#i-estrela"/></svg> Recomendado</span>
             <div class="opcao-topo"><span class="opcao-icone"><svg class="icone" aria-hidden="true"><use href="#i-painel"/></svg></span><div><span class="opcao-letra">Opção B</span><h3>Placas no telhado</h3></div></div>
-            <p class="descricao">Você compra e instala o sistema. Investimento inicial maior, economia maior.</p>
+            <span class="tag-objetivo">Seu objetivo</span>
+            <p class="descricao">Você instala as placas e passa a gerar sua energia. Pede um investimento no começo, que volta em economia todo mês.</p>
             <div id="conteudo-b"></div>
           </article>
         </div>

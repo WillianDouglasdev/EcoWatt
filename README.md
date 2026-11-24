@@ -13,9 +13,16 @@ A pessoa digita o **valor da conta de luz** (não precisa saber o consumo em kWh
 
 Um **motor de regras** recomenda a melhor opção (imóvel alugado, fatura mínima e ganho em 5 anos), mas as duas aparecem sempre.
 
+## Como funciona a simulação
+
+1. **Escolha seu objetivo:** "Quero economizar sem obra" (assinatura solar) ou "Quero gerar minha própria energia" (placas).
+2. **Mostre sua conta:** CEP, valor da conta, tipo de ligação e se o imóvel é próprio ou alugado.
+3. **Veja o que você ganha:** a economia do seu objetivo em destaque, a conta antes e depois, e o seu impacto no planeta.
+
 ## O que o site mostra
 
-- **Economia em R$** em destaque, por mês e em 12 meses.
+- **Economia em R$** em destaque, por mês e por ano, com a conta **antes x depois** e o desconto em %.
+- **Impacto ambiental:** kWh de energia limpa por ano, CO₂ evitado (fator médio do sistema elétrico, MCTI), árvores equivalentes e o total em 25 anos.
 - **Gráfico de ganho acumulado** em 5 anos (A x B).
 - **Quanto do consumo o sol cobre** e quanto continua vindo da rede (o mínimo de disponibilidade da Cemig).
 - **Área do telhado (opcional):** confere se as placas cabem e recalcula a economia se não couberem.

@@ -156,25 +156,173 @@ function marcarRecomendada(recomendacao) {
   });
 }
 
+// ---------- Perfil do cliente (etapa 1) ----------
+// Dois tipos de cliente: quem quer desconto sem obra (assinatura) e quem
+// quer saber quanto custa instalar placas. O perfil muda a ordem e o destaque
+// do resultado, mas as DUAS opções continuam aparecendo e o motor de regras
+// continua decidindo o selo "Recomendado".
+let perfilAtual = null;
+const PERFIS = {
+  assinatura: {
+    nome: 'Economizar sem obra',
+    titulo: 'Ótimo! Vamos ver seu desconto',
+    texto: 'Com o valor da sua conta, mostramos quais empresas de assinatura aceitam você e quanto cai a sua conta todo mês.',
+    botao: 'Ver meu desconto'
+  },
+  placas: {
+    nome: 'Gerar minha própria energia',
+    titulo: 'Ótimo! Vamos dimensionar suas placas',
+    texto: 'Com o valor da sua conta, calculamos quantas placas sua casa precisa, quanto custa e em quanto tempo o dinheiro volta.',
+    botao: 'Ver custo e economia'
+  }
+};
+
+function marcarEtapa(numero) {
+  document.querySelectorAll('#etapas li').forEach(function (li, i) {
+    li.classList.toggle('ativa', i === numero - 1);
+    li.classList.toggle('feita', i < numero - 1);
+  });
+}
+
+document.getElementById('perfis').addEventListener('click', function (evento) {
+  const botao = evento.target.closest('.perfil');
+  if (!botao) return;
+  perfilAtual = botao.dataset.perfil;
+  const info = PERFIS[perfilAtual];
+
+  document.querySelectorAll('.perfil').forEach(function (b) {
+    b.setAttribute('aria-checked', b === botao);
+  });
+  document.getElementById('perfil-escolhido-texto').textContent = info.nome;
+  document.getElementById('titulo-dados').textContent = info.titulo;
+  document.getElementById('texto-dados').textContent = info.texto;
+  document.getElementById('texto-botao').textContent = info.botao;
+  // quem só quer assinar não precisa pensar no telhado
+  document.getElementById('campo-area').hidden = perfilAtual === 'assinatura';
+  if (perfilAtual === 'assinatura') campoArea.value = '';
+
+  const etapa = document.getElementById('etapa-dados');
+  etapa.hidden = false;
+  marcarEtapa(2);
+  etapa.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  setTimeout(function () { campoCep.focus({ preventScroll: true }); }, 400);
+});
+
+document.getElementById('perfil-escolhido').addEventListener('click', function () {
+  marcarEtapa(1);
+  document.getElementById('simulador').scrollIntoView({ behavior: 'smooth' });
+});
+
+// Qual opção vai para o destaque, de acordo com o perfil e o imóvel
+function opcaoEmFoco(resultado, imovel) {
+  const temA = resultado.opcaoA.melhor !== null;
+  const podeB = imovel === 'proprio';
+  if (perfilAtual === 'assinatura') return temA ? 'A' : (podeB ? 'B' : null);
+  return podeB ? 'B' : (temA ? 'A' : null);
+}
+
 // ---------- Destaque principal (economia em R$) ----------
-function montarDestaque(resultado) {
+// Analogia: é a vitrine da loja. A primeira coisa que a pessoa vê é
+// quanto dinheiro fica no bolso, com o antes e o depois da conta.
+function montarDestaque(resultado, foco, valorConta, imovel) {
   const titulo = document.getElementById('destaque-titulo');
   const valor = document.getElementById('destaque-valor');
   const sub = document.getElementById('destaque-sub');
+  const extras = document.getElementById('destaque-extras');
+  const antesDepois = document.getElementById('antes-depois');
+  document.getElementById('destaque-perfil').textContent = 'Seu objetivo: ' + PERFIS[perfilAtual].nome.toLowerCase();
 
-  if (resultado.recomendacao === 'A') {
-    titulo.textContent = 'Com a assinatura solar você economiza';
-    valor.textContent = moeda(resultado.opcaoA.melhor.economiaMensal);
-    sub.textContent = 'por mês · ' + moeda(resultado.opcaoA.melhor.economia12m) + ' em 12 meses';
-  } else if (resultado.recomendacao === 'B') {
-    titulo.textContent = 'Com placas no telhado você economiza';
-    valor.textContent = moeda(resultado.opcaoB.economiaMensal);
-    sub.textContent = 'por mês · ' + moeda(resultado.opcaoB.economiaMensal * 12) + ' em 12 meses';
-  } else {
-    titulo.textContent = 'Nenhuma opção disponível agora';
+  if (foco === null) {
+    titulo.textContent = 'Por enquanto, nenhuma opção se encaixa';
     valor.textContent = moeda(0);
     sub.textContent = 'veja o aviso abaixo';
+    antesDepois.hidden = true;
+    extras.innerHTML = '';
+    return;
   }
+
+  const meses = PARAMETROS.horizonteAnos * 12;
+  let economia, itens;
+  if (foco === 'A') {
+    const melhor = resultado.opcaoA.melhor;
+    economia = melhor.economiaMensal;
+    titulo.textContent = 'Com a assinatura solar, você economiza';
+    document.getElementById('ad-depois-rotulo').textContent = 'Com a assinatura';
+    itens = [
+      ['Investimento', moeda(0)],
+      ['Em ' + PARAMETROS.horizonteAnos + ' anos', moeda(economia * meses)],
+      ['Melhor empresa', melhor.nome]
+    ];
+  } else {
+    const b = resultado.opcaoB;
+    economia = b.economiaMensal;
+    titulo.textContent = 'Com placas no seu telhado, você economiza';
+    document.getElementById('ad-depois-rotulo').textContent = 'Com as placas';
+    itens = [
+      ['Investimento', moeda(b.investimento)],
+      ['O dinheiro volta em', numero(b.paybackAnos, 1) + (b.paybackAnos < 2 ? ' ano' : ' anos')],
+      ['Ganho em ' + PARAMETROS.horizonteAnos + ' anos', moeda(economia * meses - b.investimento)]
+    ];
+  }
+
+  valor.textContent = moeda(economia);
+  sub.textContent = 'por mês · ' + moeda(economia * 12) + ' por ano';
+
+  // Antes x depois
+  const depois = Math.max(valorConta - economia, 0);
+  antesDepois.hidden = false;
+  document.getElementById('ad-antes').textContent = moeda(valorConta);
+  document.getElementById('ad-depois').textContent = moeda(depois);
+  document.getElementById('ad-depois-barra').style.width = (depois / valorConta * 100) + '%';
+  document.getElementById('ad-selo').textContent = '−' + numero(economia / valorConta * 100, 0) + '% na conta';
+
+  extras.innerHTML = itens.map(function (item) {
+    return '<div><span>' + item[0] + '</span><strong>' + item[1] + '</strong></div>';
+  }).join('');
+}
+
+// Explica quando o destaque não é o perfil escolhido ou quando a outra opção rende mais
+function montarDicaPerfil(resultado, foco, imovel) {
+  const dica = document.getElementById('dica-perfil');
+  let texto = '';
+  if (perfilAtual === 'assinatura' && foco === 'B') {
+    texto = 'Sua conta ainda está abaixo do valor mínimo das empresas de assinatura. A boa notícia: com placas no telhado você economiza ainda assim. Veja abaixo.';
+  } else if (perfilAtual === 'placas' && foco === 'A') {
+    texto = 'Em imóvel alugado normalmente não dá para instalar placas. Mas a assinatura solar funciona para você, sem obra nenhuma.';
+  } else if (foco && resultado.recomendacao && resultado.recomendacao !== foco) {
+    texto = resultado.recomendacao === 'B'
+      ? 'Vale saber: se você tiver como investir, as placas rendem mais em ' + PARAMETROS.horizonteAnos + ' anos. Compare as duas opções abaixo.'
+      : 'Vale saber: para a sua conta, a assinatura rende mais em ' + PARAMETROS.horizonteAnos + ' anos, sem precisar investir. Compare as duas opções abaixo.';
+  }
+  dica.textContent = texto;
+  dica.hidden = texto === '';
+}
+
+// Coloca o card do objetivo da pessoa em primeiro lugar
+function ordenarOpcoes(foco) {
+  document.getElementById('grade-opcoes').dataset.foco = foco || '';
+  document.getElementById('card-a').classList.toggle('objetivo', foco === 'A');
+  document.getElementById('card-b').classList.toggle('objetivo', foco === 'B');
+}
+
+// ---------- Impacto ambiental ----------
+function montarImpacto(resultado, foco) {
+  const card = document.getElementById('card-impacto');
+  if (foco === null || resultado.impacto.kwhAno <= 0) { card.hidden = true; return; }
+  card.hidden = false;
+  const imp = resultado.impacto;
+  const toneladas = imp.co2VidaUtil >= 1000;
+  document.getElementById('imp-kwh').textContent = numero(imp.kwhAno, 0) + ' kWh';
+  document.getElementById('imp-co2').textContent = numero(imp.co2Ano, 0) + ' kg';
+  document.getElementById('imp-arvores').textContent = imp.arvores + (imp.arvores === 1 ? ' árvore' : ' árvores');
+  document.getElementById('imp-vida').textContent = toneladas ? numero(imp.co2VidaUtil / 1000, 1) + ' t' : numero(imp.co2VidaUtil, 0) + ' kg';
+  document.getElementById('impacto-texto').textContent = (foco === 'A' ? 'Com a assinatura, ' : 'Com as placas, ') +
+    'cerca de ' + numero(imp.kwhAno, 0) + ' kWh por ano da sua casa passam a vir do sol. Menos usina térmica ligada, cidade mais limpa.';
+  // Uma "florestinha": um ícone de árvore para cada árvore equivalente (até 40)
+  const qtd = Math.min(imp.arvores, 40);
+  let arvores = '';
+  for (let i = 0; i < qtd; i++) arvores += '<span style="animation-delay:' + (i * 0.03).toFixed(2) + 's">' + icone('arvore') + '</span>';
+  document.getElementById('floresta').innerHTML = arvores;
 }
 
 // Eixo do gráfico mais limpo: "R$ 8 mil" em vez de "R$ 8.000,00"
@@ -530,7 +678,12 @@ formulario.addEventListener('submit', function (evento) {
   const areaTelhado = Number(campoArea.value) || 0; // vazio = não informado
   const resultado = simular(valorConta, tipoLigacao, imovel, areaTelhado);
 
-  montarDestaque(resultado);
+  const foco = opcaoEmFoco(resultado, imovel);
+  montarDestaque(resultado, foco, valorConta, imovel);
+  montarDicaPerfil(resultado, foco, imovel);
+  ordenarOpcoes(foco);
+  montarImpacto(resultado, foco);
+  marcarEtapa(3);
   montarCardA(resultado.opcaoA);
   montarCardB(resultado.opcaoB);
   marcarRecomendada(resultado.recomendacao);
@@ -541,7 +694,7 @@ formulario.addEventListener('submit', function (evento) {
   // Aviso quando o imóvel é alugado e nenhuma empresa aceita a conta
   const aviso = document.getElementById('aviso-geral');
   if (resultado.recomendacao === null) {
-    aviso.textContent = 'Nenhuma opção disponível: imóvel alugado não permite instalar placas e sua conta está abaixo da fatura mínima das empresas de assinatura.';
+    aviso.textContent = 'Por enquanto não encontramos uma opção para você: em imóvel alugado não dá para instalar placas, e sua conta está abaixo do mínimo das empresas de assinatura (a partir de ' + moeda(Math.min.apply(null, EMPRESAS.map(function (e) { return e.faturaMinima; }))) + '). Se a conta subir, vale simular de novo.';
     aviso.hidden = false;
   } else {
     aviso.hidden = true;
