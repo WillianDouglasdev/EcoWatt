@@ -1,5 +1,5 @@
 /* =============================================================
-   EcoWatt – js/calculo.js
+   Sol na Conta – js/calculo.js
    Funções PURAS de cálculo: recebem números e devolvem números.
    Este arquivo NÃO mexe na tela (DOM). Funciona como uma
    calculadora: você aperta os botões (entradas) e ela devolve o
@@ -147,22 +147,111 @@ function economiaAcumulada(opcaoA, opcaoB) {
   return { anos, acumuladoA, acumuladoB };
 }
 
+/* ---------- EXTRA 1: quanto do consumo o sol cobre (e o telhado) ---------- */
+
+// Analogia: a conta de luz é uma pizza. O sol pode comer quase toda,
+// mas uma fatia (o mínimo de disponibilidade) é sempre da Cemig.
+// areaTelhado é opcional (m²). Se vier, conferimos se as placas cabem.
+// NÃO altera a Opção B: só ajuda a explicar o resultado.
+function calcularCobertura(opcaoB, areaTelhado) {
+  const ex = PARAMETROS_EXTRAS;
+  const temArea = areaTelhado > 0;
+  const placasQueCabem = temArea ? Math.floor(areaTelhado / ex.areaPorPlaca) : opcaoB.numPlacas;
+  const placasUsadas = Math.min(placasQueCabem, opcaoB.numPlacas);
+
+  // geração mensal das placas que de fato vão para o telhado
+  const geracaoMensal = placasUsadas * PARAMETROS.potenciaPlaca / 1000 * opcaoB.geracaoPorKwp;
+  const kwhDoSol = Math.min(geracaoMensal, opcaoB.energiaCompensar);   // o que o sol "apaga" da conta
+  const kwhDaRede = Math.max(opcaoB.consumo - kwhDoSol, 0);              // o que continua vindo da Cemig
+  const percentualSol = opcaoB.consumo > 0 ? kwhDoSol / opcaoB.consumo * 100 : 0;
+
+  return {
+    temArea,
+    areaNecessaria: opcaoB.numPlacas * ex.areaPorPlaca,
+    placasQueCabem,
+    placasUsadas,
+    cabeTudo: placasUsadas >= opcaoB.numPlacas,
+    geracaoMensal,
+    kwhDoSol,
+    kwhDaRede,
+    percentualSol,
+    // se o telhado for pequeno, a economia real fica menor que a do card B
+    economiaComTelhado: kwhDoSol * PARAMETROS.tarifa * PARAMETROS.fatorCompensacao
+  };
+}
+
+/* ---------- EXTRA 2: um dia de sol (excedente e bateria) ---------- */
+
+// Analogia: as placas são uma torneira que só abre de dia, e a casa é
+// um copo que bebe mais à noite. Ao meio-dia a torneira enche mais do que
+// o copo bebe (EXCEDENTE); à noite o copo fica com sede (FALTA).
+// Hoje a sobra vai para a rede e vira crédito; uma bateria seria uma
+// "garrafa" para guardar essa sobra e usar à noite.
+function simularDiaDeSol(geracaoMensal, consumoMensal) {
+  const ex = PARAMETROS_EXTRAS;
+  const horasDeSol = ex.porDoSol - ex.nascerDoSol;
+
+  // Curva do sol em forma de "morro": começa em zero, sobe até o meio-dia e desce
+  const pesoSol = [];
+  for (let h = 0; h < 24; h++) {
+    const dentro = h >= ex.nascerDoSol && h < ex.porDoSol;
+    pesoSol.push(dentro ? Math.sin(Math.PI * (h + 0.5 - ex.nascerDoSol) / horasDeSol) : 0);
+  }
+  const somaSol = pesoSol.reduce((a, b) => a + b, 0);
+  const somaConsumo = ex.pesoConsumoHora.reduce((a, b) => a + b, 0);
+
+  const geracaoDia = geracaoMensal / 30;
+  const consumoDia = consumoMensal / 30;
+  const geracaoHora = [], consumoHora = [];
+  let excedente = 0, falta = 0;
+
+  for (let h = 0; h < 24; h++) {
+    const g = geracaoDia * pesoSol[h] / somaSol;
+    const c = consumoDia * ex.pesoConsumoHora[h] / somaConsumo;
+    geracaoHora.push(g);
+    consumoHora.push(c);
+    excedente += Math.max(g - c, 0);   // sobrou nesta hora
+    falta += Math.max(c - g, 0);       // faltou nesta hora
+  }
+
+  // A bateria só precisa guardar o que vai ser usado depois (o menor dos dois)
+  const guardar = Math.min(excedente, falta);
+  // arredonda para cima de 0,5 em 0,5 kWh (tamanhos comuns de bateria)
+  const bateriaKwh = guardar > 0 ? Math.ceil(guardar / ex.bateriaUtil * 2) / 2 : 0;
+
+  return {
+    geracaoHora,
+    consumoHora,
+    geracaoDia,
+    consumoDia,
+    excedente,                                      // kWh/dia que sobram de dia
+    falta,                                          // kWh/dia que faltam (noite)
+    usadoNaHora: geracaoDia - excedente,            // energia do sol usada na mesma hora
+    percentualExcedente: geracaoDia > 0 ? excedente / geracaoDia * 100 : 0,
+    bateriaKwh
+  };
+}
+
 /* ---------- Função principal ---------- */
 
 // Junta tudo: é a única função que o app.js precisa chamar.
 // tipoLigacao: "monofasica" | "bifasica" | "trifasica"
 // imovel: "proprio" | "alugado"
-function simular(valorConta, tipoLigacao, imovel) {
+// areaTelhado: m² (opcional; 0 ou vazio = não informado)
+function simular(valorConta, tipoLigacao, imovel, areaTelhado) {
   const consumo = calcularConsumo(valorConta);
   const opcaoA = calcularOpcaoA(valorConta);
   const opcaoB = calcularOpcaoB(valorConta, tipoLigacao);
   const regra = recomendar(opcaoA, opcaoB, imovel);
+  const cobertura = calcularCobertura(opcaoB, areaTelhado || 0);
   return {
     consumo,
     opcaoA,                          // { empresas, melhor }
     opcaoB,
     recomendacao: regra.opcao,       // "A" | "B" | null
     motivo: regra.motivo,
-    grafico: economiaAcumulada(opcaoA, opcaoB)   // { anos, acumuladoA, acumuladoB } para o Chart.js
+    grafico: economiaAcumulada(opcaoA, opcaoB),   // { anos, acumuladoA, acumuladoB } para o Chart.js
+    cobertura,                                    // extra: % do consumo coberto pelo sol + telhado
+    dia: simularDiaDeSol(cobertura.geracaoMensal, consumo)  // extra: excedente e bateria
   };
 }

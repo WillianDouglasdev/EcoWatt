@@ -1,5 +1,5 @@
 /* =========================================================
-   EcoWatt – identidade visual e responsividade
+   Sol na Conta – identidade visual e responsividade
    Analogia: este arquivo é a "roupa" do site. O HTML é o corpo
    (o que existe na página) e o CSS decide cor, tamanho e posição.
    As variáveis abaixo funcionam como a "paleta do pintor":
@@ -477,4 +477,76 @@ fieldset.campo { margin-top: 4px; }
   .area-grafico { height: 260px; }
   .card-grafico { padding: 22px 16px; }
   .motivo { border-radius: var(--raio); align-items: flex-start; text-align: left; }
+}
+
+/* =========================================================
+   EXTRAS: cobertura do sol, um dia de sol e energia inteligente
+   ========================================================= */
+.opcional { font-weight: 500; color: var(--texto-suave); font-size: 0.84rem; }
+.campo-sufixo span { left: auto; right: 16px; }
+.campo-sufixo input[type="number"] { padding-left: 16px; padding-right: 48px; }
+
+/* Barra "pizza": quanto do consumo vem do sol e quanto da rede */
+.card-sol h3 .icone, .card-dia h3 .icone { color: var(--amarelo); margin-right: 4px; }
+.card-sol h3 .opcao-letra { margin-left: 6px; font-weight: 700; letter-spacing: 0.08em; }
+.barra-pizza { display: flex; height: 22px; border-radius: 999px; overflow: hidden; background: #EDF2EE; margin: 16px 0 12px; }
+.barra-pizza i { display: block; height: 100%; transition: width 0.6s ease; }
+.fatia-sol { background: linear-gradient(90deg, var(--amarelo-vivo), var(--amarelo)); }
+.fatia-rede { background: repeating-linear-gradient(135deg, #B0BEC5 0 6px, #CFD8DC 6px 12px); }
+.legenda-pizza { display: flex; flex-wrap: wrap; gap: 8px 24px; font-size: 0.94rem; margin-bottom: 10px; }
+.legenda-pizza span { display: inline-flex; align-items: center; gap: 8px; color: var(--texto-suave); }
+.legenda-pizza strong { color: var(--texto); }
+.ponto { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+.ponto-sol { background: var(--amarelo); }
+.ponto-rede { background: #B0BEC5; }
+.aviso-telhado { margin: 14px 0 0; }
+.aviso-ok { background: var(--verde-suave); border-color: #A5D6A7; color: var(--verde-escuro); }
+
+/* Um dia de sol */
+.subtitulo-card { margin: -10px 0 16px; }
+.area-grafico-dia { height: 300px; }
+.numeros-dia { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 8px 0 16px; }
+.numeros-dia > div { background: var(--verde-suave); border-radius: var(--raio-p); padding: 16px; display: flex; flex-direction: column; gap: 2px; }
+.numeros-dia p { font-size: 0.86rem; color: var(--texto-suave); font-weight: 600; }
+.numeros-dia strong { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.numeros-dia small { font-size: 0.8rem; color: var(--texto-suave); }
+.numero-icone { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; margin-bottom: 6px; background: var(--branco); box-shadow: var(--sombra-1); }
+.numero-icone.sol { color: var(--amarelo); }
+.numero-icone.lua { color: #455A64; }
+.numero-icone.bateria { color: var(--verde); }
+#resultados.animar .card-sol, #resultados.animar .card-dia { animation: subir 0.5s ease both; animation-delay: 0.32s; }
+
+/* Seção Energia inteligente */
+.secao-inteligente { background: var(--branco); border-top: 1px solid var(--borda); border-bottom: 1px solid var(--borda); }
+.intro-secao { color: var(--texto-suave); font-size: 1.08rem; max-width: 640px; margin-bottom: 36px; }
+.trilha { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-bottom: 32px; counter-reset: passo; }
+.trilha-passo { position: relative; padding: 24px 20px; border-radius: var(--raio); background: var(--verde-suave); border: 1px solid var(--borda); }
+.trilha-passo::after { counter-increment: passo; content: "0" counter(passo); position: absolute; top: 18px; right: 18px; font-weight: 800; color: var(--borda-forte); font-size: 1.1rem; }
+.trilha-icone { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 14px; background: var(--branco); color: var(--verde); box-shadow: var(--sombra-1); margin-bottom: 14px; font-size: 1.3rem; }
+.trilha-passo p { font-size: 0.92rem; color: var(--texto-suave); line-height: 1.5; }
+.grade-inteligente { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 24px; align-items: start; }
+.grade-inteligente .card { margin-bottom: 0; }
+.cartao-dicas h3 .icone { color: var(--verde); margin-right: 4px; }
+.lista-dicas { list-style: none; display: grid; gap: 14px; margin-top: 14px; }
+.lista-dicas li { padding-left: 18px; border-left: 3px solid var(--amarelo); font-size: 0.95rem; color: var(--texto-suave); line-height: 1.5; }
+.lista-dicas strong { color: var(--texto); }
+.lista-ods { list-style: none; display: grid; gap: 16px; margin-top: 14px; }
+.lista-ods li { display: flex; gap: 14px; align-items: flex-start; font-size: 0.92rem; color: var(--texto-suave); line-height: 1.45; }
+.lista-ods strong { display: block; color: var(--texto); }
+.ods { flex-shrink: 0; width: 44px; height: 44px; border-radius: 10px; display: grid; place-items: center; color: var(--branco); font-weight: 800; font-size: 1.2rem; }
+.ods-7 { background: #FCC30B; color: #4A3A00; }
+.ods-9 { background: #FD6925; }
+.ods-11 { background: #FD9D24; color: #4A2A00; }
+
+@media (max-width: 960px) {
+  .trilha { grid-template-columns: repeat(2, 1fr); }
+  .grade-inteligente { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .numeros-dia { grid-template-columns: 1fr; gap: 10px; }
+  .numeros-dia > div { display: grid; grid-template-columns: 36px 1fr; column-gap: 14px; padding: 12px 14px; }
+  .numeros-dia .numero-icone { grid-row: span 3; margin: 0; align-self: center; }
+  .numeros-dia strong { font-size: 1.3rem; }
+  .trilha { grid-template-columns: 1fr; }
+  .area-grafico-dia { height: 240px; }
 }

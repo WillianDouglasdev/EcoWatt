@@ -1,5 +1,5 @@
 /* =========================================================
-   EcoWatt – app.js
+   Sol na Conta – app.js
    Papel deste arquivo: ser o "garçom" do site.
    Ele pega o pedido (formulário), leva para a cozinha
    (funções de js/calculo.js) e traz o prato pronto (resultados na tela).
@@ -11,9 +11,11 @@ const formulario = document.getElementById('formulario');
 const campoCep = document.getElementById('cep');
 const campoConta = document.getElementById('valorConta');
 const campoLigacao = document.getElementById('tipoLigacao');
+const campoArea = document.getElementById('areaTelhado');
 const secaoResultados = document.getElementById('resultados');
 
-let graficoAtual = null; // guarda o gráfico para poder apagar antes de desenhar outro
+let graficoAtual = null;    // guarda o gráfico para poder apagar antes de desenhar outro
+let graficoDiaAtual = null; // mesmo papel, para o gráfico "Um dia de sol"
 
 // ---------- Ícones ----------
 // "Carimba" um ícone que está guardado no index.html (<symbol id="i-nome">)
@@ -63,7 +65,7 @@ function validarFormulario() {
     mostrarErro(campoCep, 'CEP incompleto. Digite os 8 números.');
     valido = false;
   } else if (!cepNaAreaAtendida(cepDigitos)) {
-    mostrarErro(campoCep, 'Por enquanto o EcoWatt atende só Minas Gerais (CEP 30000-000 a 39999-999).');
+    mostrarErro(campoCep, 'Por enquanto o Sol na Conta atende só Minas Gerais (CEP 30000-000 a 39999-999).');
     valido = false;
   } else {
     mostrarErro(campoCep, '');
@@ -76,6 +78,15 @@ function validarFormulario() {
     valido = false;
   } else {
     mostrarErro(campoConta, '');
+  }
+
+  // Área do telhado (opcional): vazio pode, número negativo não
+  const area = Number(campoArea.value);
+  if (campoArea.value !== '' && (isNaN(area) || area < 0)) {
+    mostrarErro(campoArea, 'Informe a área em m² (ou deixe em branco).');
+    valido = false;
+  } else {
+    mostrarErro(campoArea, '');
   }
 
   return valido;
@@ -232,6 +243,80 @@ function desenharGrafico(resultado) {
   });
 }
 
+// ---------- EXTRA: quanto do consumo o sol cobre ----------
+function montarCobertura(resultado) {
+  const c = resultado.cobertura;
+  const pctSol = Math.round(c.percentualSol);
+  document.getElementById('fatia-sol').style.width = c.percentualSol + '%';
+  document.getElementById('fatia-rede').style.width = (100 - c.percentualSol) + '%';
+  document.getElementById('barra-pizza').setAttribute('aria-label', 'O sol cobre ' + pctSol + '% do consumo');
+  document.getElementById('kwh-sol').textContent = numero(c.kwhDoSol, 0) + ' kWh (' + pctSol + '%)';
+  document.getElementById('kwh-rede').textContent = numero(c.kwhDaRede, 0) + ' kWh (' + (100 - pctSol) + '%)';
+
+  const minimo = PARAMETROS.disponibilidade[campoLigacao.value];
+  document.getElementById('texto-cobertura').textContent = c.cabeTudo
+    ? 'As placas cobrem tudo o que dá para compensar. Os ' + minimo + ' kWh restantes são o mínimo que a distribuidora sempre cobra (custo de disponibilidade), com ou sem placas.'
+    : 'Com o telhado informado, o sol cobre só parte do que poderia. Veja o aviso abaixo.';
+
+  // Aviso do telhado (só aparece se a pessoa informou a área)
+  const aviso = document.getElementById('aviso-telhado');
+  if (!c.temArea) {
+    aviso.hidden = true;
+  } else if (c.cabeTudo) {
+    aviso.textContent = 'Cabe! As ' + resultado.opcaoB.numPlacas + ' placas ocupam cerca de ' + numero(c.areaNecessaria, 1) + ' m² do seu telhado.';
+    aviso.classList.add('aviso-ok');
+    aviso.hidden = false;
+  } else {
+    aviso.textContent = 'O ideal são ' + resultado.opcaoB.numPlacas + ' placas (' + numero(c.areaNecessaria, 1) + ' m²), mas cabem ' + c.placasQueCabem +
+      '. Com ' + c.placasUsadas + ' placa(s) a economia fica perto de ' + moeda(c.economiaComTelhado) + '/mês' +
+      // se a economia cair mais de 15%, vale lembrar da assinatura (não precisa de telhado)
+      (c.economiaComTelhado < resultado.opcaoB.economiaMensal * 0.85 ? '. A assinatura (Opção A) pode compensar mais.' : ', quase o mesmo do ideal.');
+    aviso.classList.remove('aviso-ok');
+    aviso.hidden = false;
+  }
+}
+
+// ---------- EXTRA: um dia de sol ----------
+function montarDiaDeSol(resultado) {
+  const d = resultado.dia;
+  document.getElementById('dia-excedente').textContent = numero(d.excedente, 1) + ' kWh';
+  document.getElementById('dia-excedente-pct').textContent = numero(d.percentualExcedente, 0) + '% do que as placas geram';
+  document.getElementById('dia-falta').textContent = numero(d.falta, 1) + ' kWh';
+  document.getElementById('dia-bateria').textContent = d.bateriaKwh > 0 ? numero(d.bateriaKwh, 1) + ' kWh' : '–';
+
+  if (typeof Chart === 'undefined') return; // sem internet: os números acima já explicam
+
+  const horas = [];
+  for (let h = 0; h < 24; h++) horas.push(h + 'h');
+  const arredondar = function (lista) { return lista.map(function (v) { return Number(v.toFixed(2)); }); };
+
+  if (graficoDiaAtual) graficoDiaAtual.destroy();
+  graficoDiaAtual = new Chart(document.getElementById('grafico-dia'), {
+    data: {
+      labels: horas,
+      datasets: [
+        { type: 'bar', label: 'Geração das placas', data: arredondar(d.geracaoHora), backgroundColor: 'rgba(249, 168, 37, 0.75)', borderRadius: 4, order: 2 },
+        { type: 'line', label: 'Consumo da casa', data: arredondar(d.consumoHora), borderColor: '#1B5E20', backgroundColor: '#1B5E20',
+          borderWidth: 3, tension: 0.35, pointRadius: 0, pointHoverRadius: 5, order: 1 }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, boxHeight: 8, padding: 18, font: { weight: '600' } } },
+        tooltip: { backgroundColor: '#263238', padding: 12, cornerRadius: 10, boxPadding: 4, usePointStyle: true,
+          callbacks: { label: function (item) { return item.dataset.label + ': ' + numero(item.parsed.y, 2) + ' kWh'; } } }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 12 } },
+        y: { grid: { color: '#ECEFF1' }, ticks: { callback: function (v) { return numero(v, 1) + ' kWh'; } } }
+      }
+    }
+  });
+}
+
 // ---------- Botão "Calcular" ----------
 formulario.addEventListener('submit', function (evento) {
   evento.preventDefault(); // não recarrega a página
@@ -243,7 +328,8 @@ formulario.addEventListener('submit', function (evento) {
   const imovel = document.querySelector('input[name="imovel"]:checked').value;
 
   // A "cozinha": todas as contas acontecem em calculo.js
-  const resultado = simular(valorConta, tipoLigacao, imovel);
+  const areaTelhado = Number(campoArea.value) || 0; // vazio = não informado
+  const resultado = simular(valorConta, tipoLigacao, imovel, areaTelhado);
 
   montarDestaque(resultado);
   montarCardA(resultado.opcaoA);
@@ -267,6 +353,8 @@ formulario.addEventListener('submit', function (evento) {
   void secaoResultados.offsetWidth; // truque para o navegador reiniciar a animação
   secaoResultados.classList.add('animar');
   desenharGrafico(resultado);
+  montarCobertura(resultado);
+  montarDiaDeSol(resultado);
   secaoResultados.scrollIntoView({ behavior: 'smooth' });
 });
 

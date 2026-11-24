@@ -1,5 +1,5 @@
 /* =============================================================
-   EcoWatt – js/dados.js
+   Sol na Conta – js/dados.js
    Aqui ficam SÓ os dados (nenhum cálculo, nenhum acesso à tela).
    Pense neste arquivo como a "tabela de preços pendurada na parede":
    se a tarifa mudar, você troca o número aqui e o resto do sistema
@@ -20,6 +20,23 @@ const PARAMETROS = {
   precoPorWp: 2.45,          // R$/Wp – preço médio do sistema instalado
   fatorCompensacao: 0.90,    // efeito simplificado do Fio B (Lei 14.300/2022)
   horizonteAnos: 5           // usado na comparação do motor de regras
+};
+
+// Parâmetros EXTRAS (não mudam os números da Opção B, só explicam melhor o resultado).
+// Ficam separados do PARAMETROS para os valores oficiais de teste continuarem intactos.
+const PARAMETROS_EXTRAS = {
+  areaPorPlaca: 2.6,         // m² que cada placa de 550 Wp ocupa no telhado (2,28 m × 1,13 m + folga)
+  bateriaUtil: 0.90,         // só 90% da bateria pode ser usada sem estragá-la (profundidade de descarga)
+  // Como uma casa típica gasta energia ao longo do dia (peso de cada hora, 0h a 23h).
+  // Pouco de madrugada, um pico de manhã e o maior pico à noite (banho, janta, TV).
+  pesoConsumoHora: [
+    2, 1.6, 1.4, 1.4, 1.5, 2.2,   // 0h–5h  madrugada
+    3.4, 4.2, 3.6, 3.2, 3.2, 3.6, // 6h–11h manhã
+    4, 3.6, 3.2, 3.2, 3.6, 4.6,   // 12h–17h tarde
+    7.2, 8, 7, 5.6, 4.2, 3        // 18h–23h noite (horário de pico)
+  ],
+  nascerDoSol: 6,            // hora em que as placas começam a gerar
+  porDoSol: 18               // hora em que param
 };
 
 // Faixas de CEP atendidas no protótipo (só números, sem o hífen).
