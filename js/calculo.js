@@ -232,6 +232,35 @@ function simularDiaDeSol(geracaoMensal, consumoMensal) {
   };
 }
 
+/* ---------- EXTRA 3: calculadora de tarifa (bandeiras) ---------- */
+
+// Recalcula conta e economias para uma bandeira. O valor digitado pela
+// pessoa é tratado como a conta em bandeira VERDE; por isso, na verde,
+// os números são exatamente os dos cards A e B (os testes não mudam).
+// A elegibilidade das empresas continua a mesma do card A.
+function simularBandeira(resultado, idBandeira) {
+  const bandeira = BANDEIRAS.find(b => b.id === idBandeira) || BANDEIRAS[0];
+  const tarifaComBandeira = PARAMETROS.tarifa + bandeira.adicional;
+  const contaVerde = resultado.consumo * PARAMETROS.tarifa;
+  const conta = resultado.consumo * tarifaComBandeira;
+  const melhorA = resultado.opcaoA.melhor;
+  const b = resultado.opcaoB;
+
+  const economiaA = melhorA ? conta * melhorA.desconto : null;          // desconto vale sobre a conta toda
+  const economiaB = b.energiaCompensar * tarifaComBandeira * PARAMETROS.fatorCompensacao;
+  return {
+    bandeira,
+    tarifaComBandeira,
+    conta,
+    acrescimo: conta - contaVerde,                     // quanto a bandeira soma na conta
+    economiaA,
+    contaComAssinatura: economiaA === null ? null : conta - economiaA,
+    economiaB,
+    contaComPlacas: conta - economiaB,                 // o que sobra para pagar com placas
+    paybackB: economiaB > 0 ? b.investimento / (economiaB * 12) : Infinity
+  };
+}
+
 /* ---------- Função principal ---------- */
 
 // Junta tudo: é a única função que o app.js precisa chamar.

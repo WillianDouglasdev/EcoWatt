@@ -39,6 +39,18 @@ const PARAMETROS_EXTRAS = {
   porDoSol: 18               // hora em que param
 };
 
+// Bandeiras tarifárias (ANEEL). Analogia: é como o "preço da gasolina"
+// da energia. Quando chove pouco, as usinas mais caras ligam e a
+// bandeira muda de cor, somando um valor extra a cada kWh consumido.
+// adicional = R$ por kWh (ANEEL, valores vigentes em 2026: R$ 1,885 / 4,463 / 7,877 a cada 100 kWh).
+// Simplificação: somamos o adicional à tarifa sem recalcular os tributos.
+const BANDEIRAS = [
+  { id: "verde",     nome: "Verde",      adicional: 0,       quando: "Chuva boa: as hidrelétricas dão conta" },
+  { id: "amarela",   nome: "Amarela",    adicional: 0.01885, quando: "Chuva abaixo do normal" },
+  { id: "vermelha1", nome: "Vermelha 1", adicional: 0.04463, quando: "Seca: usinas térmicas mais caras ligadas" },
+  { id: "vermelha2", nome: "Vermelha 2", adicional: 0.07877, quando: "Seca forte: quase todas as térmicas ligadas" }
+];
+
 // Faixas de CEP atendidas no protótipo (só números, sem o hífen).
 // Nesta versão só cobrimos a Cemig (Minas Gerais).
 const FAIXA_CEP = { inicio: 30000000, fim: 39999999, distribuidora: "Cemig", estado: "MG" };
