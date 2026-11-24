@@ -261,6 +261,25 @@ function simularBandeira(resultado, idBandeira) {
   };
 }
 
+/* ---------- EXTRA 4: impacto ambiental ---------- */
+
+// Analogia: cada kWh que vem do sol é um kWh que uma usina térmica não
+// precisou queimar. Somamos esses kWh no ano e convertemos em CO₂ e em
+// "árvores trabalhando" para ficar fácil de imaginar.
+// energiaMes = kWh/mês que passam a vir de fonte solar.
+function calcularImpacto(energiaMes) {
+  const ex = PARAMETROS_EXTRAS;
+  const kwhAno = energiaMes * 12;
+  const co2Ano = kwhAno * ex.fatorEmissao;                 // kg de CO₂ por ano
+  return {
+    kwhAno,
+    co2Ano,
+    arvores: Math.round(co2Ano / ex.co2PorArvoreAno),       // árvores fixando CO₂ durante 1 ano
+    co2VidaUtil: co2Ano * ex.vidaUtilAnos,                   // kg em 25 anos
+    kwhVidaUtil: kwhAno * ex.vidaUtilAnos
+  };
+}
+
 /* ---------- Função principal ---------- */
 
 // Junta tudo: é a única função que o app.js precisa chamar.
@@ -281,6 +300,9 @@ function simular(valorConta, tipoLigacao, imovel, areaTelhado) {
     motivo: regra.motivo,
     grafico: economiaAcumulada(opcaoA, opcaoB),   // { anos, acumuladoA, acumuladoB } para o Chart.js
     cobertura,                                    // extra: % do consumo coberto pelo sol + telhado
-    dia: simularDiaDeSol(cobertura.geracaoMensal, consumo)  // extra: excedente e bateria
+    dia: simularDiaDeSol(cobertura.geracaoMensal, consumo),  // extra: excedente e bateria
+    // extra: impacto ambiental. Simplificação: nas duas opções a energia limpa
+    // que passa a abastecer a casa é a energia a compensar (consumo − mínimo).
+    impacto: calcularImpacto(opcaoB.energiaCompensar)
   };
 }

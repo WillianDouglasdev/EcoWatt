@@ -35,6 +35,10 @@ const PARAMETROS_EXTRAS = {
     4, 3.6, 3.2, 3.2, 3.6, 4.6,   // 12h–17h tarde
     7.2, 8, 7, 5.6, 4.2, 3        // 18h–23h noite (horário de pico)
   ],
+  // Impacto ambiental (ODS 7 e 11)
+  fatorEmissao: 0.0289,      // kg de CO₂ por kWh da rede (MCTI, fator médio do SIN, abr/2025: 0,0289 tCO₂/MWh)
+  co2PorArvoreAno: 7,        // kg de CO₂ que uma árvore nativa da Mata Atlântica fixa por ano (140 kg em 20 anos)
+  vidaUtilAnos: 25,          // anos de vida útil típica das placas / horizonte do impacto
   nascerDoSol: 6,            // hora em que as placas começam a gerar
   porDoSol: 18               // hora em que param
 };
